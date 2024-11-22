@@ -1,0 +1,29 @@
+@using flashcard.model
+
+<a href="/detail/@flashCard?.Slug"
+    class="block p-6 border rounded-lg shadow bg-gray-800 border-gray-700 hover:bg-gray-700">
+    <div class="flex flex-col gap-[2rem]">
+        <div class="flex flex-row items-center justify-between">
+            <p class="text-lg font-semibold text-white">@flashCard?.Title</p>
+            @* <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                class="text-gray-600 hover:text-gray-800 stroke-2 stroke-current fill-none">
+                <path
+                    d="M11 12a1 1 0 1 0 2 0 1 1 0 1 0-2 0M11 19a1 1 0 1 0 2 0 1 1 0 1 0-2 0M11 5a1 1 0 1 0 2 0 1 1 0 1 0-2 0" />
+            </svg> *@
+        </div>
+        <div class="flex flex-col">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div class="bg-blue-600 h-2.5 rounded-full"
+                    style="width: @((flashCard?.CurrentProgress ?? 0) / (float)(flashCard?.TotalProgress ?? 1) * 100)%">
+                </div>
+            </div>
+            <p class="text-sm text-gray-400 mt-1">@flashCard?.CurrentProgress/@flashCard?.TotalProgress
+                complete</p>
+        </div>
+    </div>
+</a>
+
+@code {
+    [Parameter]
+    public FlashCardBasic? flashCard { get; set; }
+}

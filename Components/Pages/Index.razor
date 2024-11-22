@@ -1,0 +1,63 @@
+﻿@page "/"
+@using flashcard.model
+@using flashcard.Components.Components
+
+<PageTitle>Flashcard</PageTitle>
+
+<div class="pt-[3rem] flex h-full flex-col gap-[3rem]">
+	<div class="grid grid-cols-3 gap-4">
+		@foreach (var flashCard in uncompleteFlashCards)
+		{
+			<div>
+				<FlashCardComponent flashCard="flashCard" />
+			</div>
+		}
+	</div>
+</div>
+
+@code
+{
+	private List<FlashCardBasic> uncompleteFlashCards = new List<FlashCardBasic>
+{
+new FlashCardBasic
+{
+Id = 1,
+Title = "Deck 1",
+Slug = "deck-1",
+CurrentProgress = 2,
+TotalProgress = 10
+},
+new FlashCardBasic
+{
+Id = 2,
+Title = "Deck 2",
+Slug = "deck-2",
+CurrentProgress = 4,
+TotalProgress = 10
+},
+new FlashCardBasic
+{
+Id = 3,
+Title = "Deck 3",
+Slug = "deck-3",
+CurrentProgress = 9,
+TotalProgress = 10
+},
+new FlashCardBasic
+{
+Id = 4,
+Title = "Deck 4",
+Slug = "deck-4",
+CurrentProgress = 10,
+TotalProgress = 10
+},
+new FlashCardBasic
+{
+Id = 5,
+Title = "Deck 5",
+Slug = "deck-5",
+CurrentProgress = 10,
+TotalProgress = 10
+}
+};
+}
