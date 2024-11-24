@@ -1,63 +1,72 @@
 ﻿@page "/"
+@using System.Diagnostics
 @using flashcard.model
 @using flashcard.Components.Components
+@using flashcard.z_dummydata
+@using flashcard.Components
+@using flashcard.Components.Icon
+@rendermode InteractiveServer
 
 <PageTitle>Flashcard</PageTitle>
 
-<div class="pt-[3rem] flex h-full flex-col gap-[3rem]">
-	<div class="grid grid-cols-3 gap-4">
-		@foreach (var flashCard in uncompleteFlashCards)
+<div class="pt-[3rem] flex h-full flex-col gap-10">
+	<div class="flex w-full items-center justify-center">
+		<div class="flex min-[480px]:flex-row flex-col w-full max-w-2xl gap-2 items-center">
+			<label class="input input-bordered flex items-center gap-2 w-full rounded-lg">
+				<input type="text" class="grow" placeholder="Search" @oninput="handleSearch" />
+				<SearchIcon />
+			</label>
+			<select class="select select-bordered rounded-lg max-[480px]:w-full" @onchange="SelectCategory">
+				<option disabled selected>Select Category</option>
+				@foreach (var category in Category.GetCategories())
+				{
+					<option value="@category.Value">@category.DisplayName</option>
+				}
+			</select>
+		</div>
+	</div>
+	<div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+		@foreach (var flashCard in filteredFlashCards)
 		{
-			<div>
-				<FlashCardComponent flashCard="flashCard" />
-			</div>
+			<FlashCardComponent flashCard="flashCard" />
 		}
 	</div>
 </div>
 
-@code
-{
-	private List<FlashCardBasic> uncompleteFlashCards = new List<FlashCardBasic>
-{
-new FlashCardBasic
-{
-Id = 1,
-Title = "Deck 1",
-Slug = "deck-1",
-CurrentProgress = 2,
-TotalProgress = 10
-},
-new FlashCardBasic
-{
-Id = 2,
-Title = "Deck 2",
-Slug = "deck-2",
-CurrentProgress = 4,
-TotalProgress = 10
-},
-new FlashCardBasic
-{
-Id = 3,
-Title = "Deck 3",
-Slug = "deck-3",
-CurrentProgress = 9,
-TotalProgress = 10
-},
-new FlashCardBasic
-{
-Id = 4,
-Title = "Deck 4",
-Slug = "deck-4",
-CurrentProgress = 10,
-TotalProgress = 10
-},
-new FlashCardBasic
-{
-Id = 5,
-Title = "Deck 5",
-Slug = "deck-5",
-CurrentProgress = 10,
-TotalProgress = 10
+@code {
+	private string searchText = string.Empty;
+	private string selectedCategory = string.Empty;
+	private List<FlashCard> flashCards = new List<FlashCard>();
+	private List<FlashCard> filteredFlashCards = new List<FlashCard>();
+
+	protected override void OnInitialized()
+	{
+		flashCards = DummyDataCardBasic.GetFlashCards();
+		filteredFlashCards = flashCards;
+	}
+
+	private void ApplyFilters()
+	{
+		filteredFlashCards = flashCards
+		.Where(fc => (string.IsNullOrEmpty(searchText) || fc.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
+		(selectedCategory == "all" || string.IsNullOrEmpty(selectedCategory) || fc.Category.Equals(selectedCategory,
+		StringComparison.OrdinalIgnoreCase)))
+		.ToList();
+	}
+
+	private void handleSearch(ChangeEventArgs e)
+	{
+		searchText = e.Value?.ToString() ?? string.Empty;
+		ApplyFilters();
+	}
+
+	private void SelectCategory(ChangeEventArgs e)
+	{
+		selectedCategory = e.Value?.ToString() ?? string.Empty;
+		ApplyFilters();
+	}
 }
-};
-}
+
+Debug search: @searchText
+<br>
+debug category: @selectedCategory

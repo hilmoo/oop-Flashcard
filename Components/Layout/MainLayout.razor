@@ -1,37 +1,61 @@
 ﻿@inherits LayoutComponentBase
+@using flashcard.Components.Icon
 
-<nav class="bg-gray-900 border-b border-gray-600">
-  <div class="mx-auto max-w-7xl px-2">
-    <div class="relative flex h-16 justify-between">
-      <div class="flex">
-        <div class="flex shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-            alt="Your Company">
+<div class="drawer">
+  <input id="drawerMain" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content">
+    <nav class="border-b border-gray-600">
+      <div class="mx-auto px-2 sm:px-10">
+        <div class="relative flex h-16 justify-between">
+          <div class="flex items-center gap-4 ">
+            <label for="drawerMain" class="btn btn-ghost drawer-button min-[400px]:hidden">
+              <MenuIcon />
+            </label>
+            <a href="/">
+              <div class="flex shrink-0 items-center">
+                <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
+                  alt="Your Company">
+              </div>
+            </a>
+          </div>
+          <div class="items-center flex max-[400px]:hidden">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <button class="btn btn-ghost rounded-md ">
+                <a href="/create">Create</a>
+              </button>
+              <button class="btn btn-ghost rounded-md ">
+                <a href="/login">Login</a>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="flex items-center">
-        <div class="ml-10 flex items-baseline space-x-4">
-          @foreach (var link in navLinks)
-          {
-            <a href="@link.Href"
-              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">@link.Text</a>
-          }
-        </div>
+    </nav>
+
+    <div class="min-h-[91.5vh]">
+      <div class="mx-auto max-w-7xl lg:px-0  px-10">
+        @Body
       </div>
     </div>
-  </div>
-</nav>
 
-<div class="bg-gray-900 min-h-[91.5vh]">
-  <div class="mx-auto max-w-7xl ">
-    @Body
+  </div>
+  <div class="drawer-side">
+    <label for="drawerMain" aria-label="close sidebar" class="drawer-overlay"></label>
+    <ul class="menu bg-base-200 text-base-content min-h-full w-80 max-w-full p-4">
+      <li>
+        <button class="btn btn-ghost rounded-md w-full">
+          <a href="/create">Create</a>
+        </button>
+      </li>
+      <li>
+        <button class="btn btn-ghost rounded-md w-full">
+          <a href="/login">Login</a>
+        </button>
+      </li>
+    </ul>
   </div>
 </div>
 
+
 @code {
-  private List<(string Text, string Href)> navLinks = new List<(string Text, string Href)>
-{
-("Progress", "/"),
-("All Decks", "/decks"),
-};
 }

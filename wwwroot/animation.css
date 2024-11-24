@@ -1,0 +1,25 @@
+.flipcard {
+  perspective: 1000px;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+}
+
+.flipcard.flipped {
+  transform: rotateX(180deg);
+}
+
+.flipcard-front,
+.flipcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 25px;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flipcard-back {
+  transform: rotateX(180deg);
+}

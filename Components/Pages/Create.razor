@@ -1,0 +1,154 @@
+@page "/create"
+@using flashcard.model
+@using flashcard.services
+@inject FlashCardService FlashCardService
+@rendermode InteractiveServer
+
+<div class="flex flex-col py-10 max-w-xl mx-auto gap-3">
+    <label class="form-control w-full">
+        <div class="label">
+            <span class="label-text">Deck name</span>
+        </div>
+        <input type="text" placeholder="Type deck name" class="input input-bordered w-full rounded-lg"
+            @onchange="handleDeckName" />
+    </label>
+    <label class="form-control w-full">
+        <div class="label">
+            <span class="label-text">Deck category</span>
+        </div>
+        <select class="select select-bordered rounded-lg max-[480px]:w-full" @onchange="handleSelectCategory">
+            <option disabled selected>Select Category</option>
+            @foreach (var category in Category.GetCategoriesExceptAll())
+            {
+                <option value="@category.Value">@category.DisplayName</option>
+            }
+        </select>
+    </label>
+    <div class="pt-2 w-full">
+        <button class="btn rounded-lg w-full" onclick="aaaaaa.showModal()">Add Card</button>
+        <div class="overflow-x-auto">
+            <table class="table table-auto">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Del</th>
+                        <th>Question</th>
+                        <th>Answer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < FlashCardService.FlashCardProblems.Count; i++)
+                    {
+                        var problem = FlashCardService.FlashCardProblems[i];
+                        var currentIndex = i;
+                        <tr class="hover">
+                            <th>@(i + 1)</th>
+                            <td>
+                                <div class="cursor-pointer bg-transparent"
+                                    @onclick="() => DeleteFlashCardProblem(currentIndex)">
+                                    <flashcard.Components.Icon.IconDelete />
+                                </div>
+                            </td>
+                            <td class="truncate">@problem.Question</td>
+                            <td class="truncate">@problem.Answer</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<dialog id="aaaaaa" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <form>
+            <h3 class="text-lg font-bold">New Card</h3>
+            <div class="flex flex-col gap-5 py-3">
+                <textarea class="textarea textarea-bordered" placeholder="Question" @onchange="handleQuestionChange"
+                    required></textarea>
+                <textarea class="textarea textarea-bordered" placeholder="Answer" @onchange="handleAnswerChange"
+                    required></textarea>
+            </div>
+            <div class="flex flex-row justify-between">
+                <div onclick="aaaaaa.close()">
+                    <button type="button" class="btn btn-sm btn-error text-white rounded-md"
+                        @onclick="handleDiscard">Discard</button>
+                </div>
+                <button type="submit" class="btn btn-sm btn-success rounded-md" @onclick="handleSave">Save</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+debug deckName: @deckName
+<br>
+debug selectedCategory: @selectedCategory
+
+@code {
+    private string deckName = string.Empty;
+    private void handleDeckName(ChangeEventArgs e)
+    {
+        deckName = e.Value?.ToString() ?? string.Empty;
+    }
+    private string selectedCategory = string.Empty;
+    private void handleSelectCategory(ChangeEventArgs e)
+    {
+        selectedCategory = e.Value?.ToString() ?? string.Empty;
+    }
+}
+
+<br>
+debug tempQuestion: @tempQuestion
+<br>
+debug tempAnswer: @tempAnswer
+<br>
+debug flashCardProblemsLength: @FlashCardService.FlashCardProblems.Count
+<ul>
+    @for (int i = 0; i < FlashCardService.FlashCardProblems.Count; i++)
+    {
+        var problem = FlashCardService.FlashCardProblems[i];
+        <li>
+            <strong>Index:</strong> @i <br />
+            <strong>Question:</strong> @problem.Question <br />
+            <strong>Answer:</strong> @problem.Answer
+        </li>
+    }
+</ul>
+
+@code {
+    private string tempQuestion = string.Empty;
+    private string tempAnswer = string.Empty;
+    private void handleQuestionChange(ChangeEventArgs e)
+    {
+        tempQuestion = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void handleAnswerChange(ChangeEventArgs e)
+    {
+        tempAnswer = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void handleDiscard()
+    {
+        tempQuestion = string.Empty;
+        tempAnswer = string.Empty;
+    }
+
+    private void handleSave()
+    {
+        if (!string.IsNullOrWhiteSpace(tempQuestion) && !string.IsNullOrWhiteSpace(tempAnswer))
+        {
+            AddFlashCardProblem(tempQuestion, tempAnswer);
+            tempQuestion = string.Empty;
+            tempAnswer = string.Empty;
+        }
+    }
+    private void AddFlashCardProblem(string question, string answer)
+    {
+        FlashCardService.AddFlashCardProblem(question, answer);
+    }
+
+    private void DeleteFlashCardProblem(int Index)
+    {
+        FlashCardService.DeleteFlashCardProblem(Index);
+    }
+}
