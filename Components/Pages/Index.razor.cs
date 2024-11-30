@@ -1,6 +1,8 @@
 ﻿using flashcard.model;
 using flashcard.z_dummydata;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace flashcard.Components.Pages
 {
@@ -10,11 +12,20 @@ namespace flashcard.Components.Pages
 		private string selectedCategory = string.Empty;
 		private List<FlashCard> flashCards = [];
 		private List<FlashCard> filteredFlashCards = [];
+		private string? userEmail;
 
-		protected override void OnInitialized()
+
+		protected override async Task OnInitializedAsync()
 		{
 			flashCards = DummyDataCardBasic.GetFlashCards();
 			filteredFlashCards = flashCards;
+			var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+
+			if (user.Identity?.IsAuthenticated ?? false)
+			{
+				userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+			}
 		}
 
 		private void ApplyFilters()

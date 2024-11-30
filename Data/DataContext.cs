@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace flashcard.Data
 {
-	public class FlashcardDbContext : DbContext
+	public class DataContext : DbContext
 	{
-		public FlashcardDbContext(DbContextOptions<FlashcardDbContext> options) : base(options)
+		public DataContext(DbContextOptions<DataContext> options) : base(options)
 		{
 		}
+
 		public DbSet<Account> Accounts { get; set; }
 	}
 }
