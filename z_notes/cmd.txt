@@ -1,0 +1,6 @@
+﻿Migration notes
+- pake PMC
+- set temp env
+[System.Environment]::SetEnvironmentVariable("DATABASE_URL", "Host=localhost;Database=mydb;Username=myuser;Password=mypassword")
+- migration
+Update-Database

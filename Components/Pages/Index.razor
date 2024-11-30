@@ -1,11 +1,8 @@
 ﻿@page "/"
-@using System.Diagnostics
+@rendermode InteractiveServer
 @using flashcard.model
 @using flashcard.Components.Components
-@using flashcard.z_dummydata
-@using flashcard.Components
 @using flashcard.Components.Icon
-@rendermode InteractiveServer
 
 <PageTitle>Flashcard</PageTitle>
 
@@ -13,7 +10,7 @@
 	<div class="flex w-full items-center justify-center">
 		<div class="flex min-[480px]:flex-row flex-col w-full max-w-2xl gap-2 items-center">
 			<label class="input input-bordered flex items-center gap-2 w-full rounded-lg">
-				<input type="text" class="grow" placeholder="Search" @oninput="handleSearch" />
+				<input type="text" class="grow" placeholder="Search" @oninput="HandleSearch" />
 				<SearchIcon />
 			</label>
 			<select class="select select-bordered rounded-lg max-[480px]:w-full" @onchange="SelectCategory">
@@ -32,40 +29,6 @@
 		}
 	</div>
 </div>
-
-@code {
-	private string searchText = string.Empty;
-	private string selectedCategory = string.Empty;
-	private List<FlashCard> flashCards = new List<FlashCard>();
-	private List<FlashCard> filteredFlashCards = new List<FlashCard>();
-
-	protected override void OnInitialized()
-	{
-		flashCards = DummyDataCardBasic.GetFlashCards();
-		filteredFlashCards = flashCards;
-	}
-
-	private void ApplyFilters()
-	{
-		filteredFlashCards = flashCards
-		.Where(fc => (string.IsNullOrEmpty(searchText) || fc.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
-		(selectedCategory == "all" || string.IsNullOrEmpty(selectedCategory) || fc.Category.Equals(selectedCategory,
-		StringComparison.OrdinalIgnoreCase)))
-		.ToList();
-	}
-
-	private void handleSearch(ChangeEventArgs e)
-	{
-		searchText = e.Value?.ToString() ?? string.Empty;
-		ApplyFilters();
-	}
-
-	private void SelectCategory(ChangeEventArgs e)
-	{
-		selectedCategory = e.Value?.ToString() ?? string.Empty;
-		ApplyFilters();
-	}
-}
 
 Debug search: @searchText
 <br>
