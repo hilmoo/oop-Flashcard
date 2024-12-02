@@ -3,7 +3,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "12024:8080"
+      - "127.0.0.1:12024:8080"
     env_file: 
       - .env
   #   depends_on:
