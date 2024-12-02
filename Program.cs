@@ -16,7 +16,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContextFactory<DataContext>(options =>
 {
-	options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? throw new InvalidOperationException("ilang stringnya"));
+	options.UseNpgsql(PostgresConstants.ConnectionString);
 });
 
 

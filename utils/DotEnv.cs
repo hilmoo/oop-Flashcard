@@ -22,7 +22,7 @@ namespace flashcard.utils
 					continue; // Skip lines without a valid key=value format
 
 				var key = line.Substring(0, indexOfEquals).Trim();
-				var value = line.Substring(indexOfEquals + 1).Trim().Trim('"');
+				var value = line.Substring(indexOfEquals + 1).Trim();
 
 				if (!string.IsNullOrEmpty(key) && value != null)
 				{
