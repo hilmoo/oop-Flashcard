@@ -3,6 +3,8 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authorization
 @inject NavigationManager Navigation
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IAuthenticationService AuthenticationService
 
 <div class="drawer">
 	<input id="drawerMain" type="checkbox" class="drawer-toggle" />
@@ -24,7 +26,14 @@
 					<div class="items-center flex max-[400px]:hidden">
 						<div class="ml-10 flex items-baseline space-x-4">
 							<a href="/create" class="btn btn-ghost rounded-md">Create</a>
-							<a href="/create" class="btn btn-ghost rounded-md">Create</a>
+							@if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                            {
+                                <a href="/profile" class="btn btn-ghost rounded-md">Profile</a>
+                            }
+                            else
+                            {
+                                <a href="/auth/signin" class="btn btn-ghost rounded-md">Sign In</a>
+                            }
 						</div>
 					</div>
 				</div>
@@ -48,7 +57,7 @@
 			</li>
 			<li>
 				<button class="btn btn-ghost rounded-md w-full">
-					<a href="/login">Login</a>
+					<a href="/auth/signin" class="btn btn-ghost rounded-md">Sign In</a>
 				</button>
 			</li>
 		</ul>

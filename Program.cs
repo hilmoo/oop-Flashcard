@@ -11,6 +11,11 @@ DotEnv.Load(dotenv);
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorComponents()
 		.AddInteractiveServerComponents();
 
@@ -32,6 +37,14 @@ builder.Services.AddAuthentication("Cookies")
 		googleOpt.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") ?? throw new InvalidOperationException("GOOGLE_CLIENT_ID is not set in the environment variables.");
 		googleOpt.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? throw new InvalidOperationException("GOOGLE_CLIENT_SECRET is not set in the environment variables.");
 	});
+
+builder.Services.AddSingleton<Supabase.Client>(serviceProvider =>
+{
+    var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL") ?? throw new InvalidOperationException("SUPABASE_URL not set");
+    var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_ANON_KEY") ?? throw new InvalidOperationException("SUPABASE_ANON_KEY not set");
+
+    return new Supabase.Client(supabaseUrl, supabaseKey);
+});
 
 builder.Services.AddSingleton<FlashCardService>();
 builder.Services.AddTransient<DbAccountServices>();

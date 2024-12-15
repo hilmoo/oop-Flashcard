@@ -1,10 +1,26 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Authentication;
 
 namespace flashcard.Components.Pages
 {
 	public partial class Create : ComponentBase
 	{
-		private string deckName = string.Empty;
+        [CascadingParameter]
+        public required HttpContext HttpContext { get; set; }
+
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
+
+		protected override async Task OnInitializedAsync()
+		{
+			if (!HttpContext.User.Identity!.IsAuthenticated)
+			{
+				NavigationManager.NavigateTo("/auth/signin");
+				return;
+			}
+		}
+
+        private string deckName = string.Empty;
 		private void HandleDeckName(ChangeEventArgs e)
 		{
 			deckName = e.Value?.ToString() ?? string.Empty;
