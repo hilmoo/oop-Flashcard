@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-//using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using flashcard.utils;
-//using Supabase.Storage;
 using flashcard.model.Entities;
 
 namespace flashcard.Components.Pages

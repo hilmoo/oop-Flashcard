@@ -1,7 +1,9 @@
-﻿using flashcard.model.Entities;
+﻿using flashcard.model;
+using flashcard.model.Entities;
 using flashcard.utils;
 using flashcard.z_dummydata;
 using Microsoft.AspNetCore.Components;
+using Supabase.Interfaces;
 
 namespace flashcard.Components.Pages
 {
@@ -12,12 +14,15 @@ namespace flashcard.Components.Pages
 
 		//private List<FlashCardProblem> soalll = [];
 		private List<Problem> soal = [];
-		private int currentIndex = 0;
+		private Flashcard? deckData;
+		private string? author;
+        private int currentIndex = 0;
 		private bool IsStart { get; set; } = false;
 
 		protected override async Task OnInitializedAsync()
 		{
 			soal = await FlashCardService.GetProblemsByFlashcardSlug(Slug);
+			deckData = await FlashCardService.GetFlashcardBySlug(Slug);
 		}
 
 		private void HandleNext()

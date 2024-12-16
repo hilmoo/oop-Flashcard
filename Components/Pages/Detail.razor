@@ -3,6 +3,7 @@
 @inject flashcard.utils.FlashCardService FlashCardService
 @rendermode InteractiveServer
 
+<PageTitle>@deckData?.Title</PageTitle>
 <div class="h-screen w-screen">
 	<div class="border-b border-gray-600">
 		<div class="flex h-16 items-center flex-nowrap px-2 sm:px-10">
@@ -14,7 +15,7 @@
 			</div>
 			<div class="flex-grow flex-row items-center text-center">
 				<div>
-					<span class="text-lg font-semibold">Nama Soal</span>
+					<span class="text-lg font-semibold">@deckData?.Title (@deckData?.Category)</span>
 				</div>
 				<div>
 					<span class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soal.Count</span>
@@ -28,19 +29,13 @@
 			<div class="flex flex-col gap-5 h-full p-[2rem] mx-auto max-w-5xl">
 				<div class="flex flex-col gap-3 p-10 justify-center bg-secondary w-full h-full items-center">
 					<p class="text-3xl text-center">
-						Ini judul
-						@Slug
+						@deckData?.Title
 					</p>
 					<p class="text-lg line-clamp-6 text-center">
-						Lorem ipsum dolor sit amet consectetur, adipisicing elit. Culpa amet dolore commodi, autem incidunt
-						a
-						dolores animi ea? Ut vitae nulla repellat, molestias debitis nemo iusto magnam eum perspiciatis
-						rerum.
-						Consequatur sit illo provident esse tempora, ipsa ipsam alias nulla debitis accusamus. Omnis
-						veritatis
-						quidem quam, ipsam, perferendis ab totam labore vitae veniam
+						@deckData?.Description
 					</p>
 					<button class="btn btn-active" @onclick=ToggleStart>Start</button>
+					<a href="/edit/@Slug" class="btn btn-active">Edit</a>
 				</div>
 				<div class="flex-none items-center h-14 ">
 				</div>
@@ -51,13 +46,11 @@
 			<div class="flex flex-col gap-5 h-full p-[2rem] mx-auto max-w-5xl">
 				<div class="flipcard cursor-pointer w-full h-full ">
 					<div class="flipcard-front bg-secondary">
-						problem
 						<article class="prose lg:prose-xl">
 							@soal[currentIndex].Question
 						</article>
 					</div>
 					<div class="flipcard-back bg-secondary">
-						Answer
 						<article class="prose lg:prose-xl">
 							@soal[currentIndex].Answer
 						</article>

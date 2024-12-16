@@ -82,6 +82,15 @@ namespace flashcard.utils
 			}
 		}
 
+		public async Task<Flashcard> GetFlashcardBySlug(string slug)
+		{
+			var deckName = await _supabaseClient
+				.From<Flashcard>()
+				.Where(x => x.Slug == slug)
+				.Single();
+
+			return deckName!;
+        }
 		public async Task<List<Problem>> GetProblemsByFlashcardSlug(string flashcardSlug)
 		{
 			try
@@ -105,18 +114,4 @@ namespace flashcard.utils
 			}
 		}
 	}
-    //   public class FlashCardService
-	//{
-	//	public List<FlashCardProblem> FlashCardProblems { get; private set; } = new List<FlashCardProblem>();
-
-	//	public void AddFlashCardProblem(string question, string answer)
-	//	{
-	//		FlashCardProblems.Add(new FlashCardProblem { Question = question, Answer = answer });
-	//	}
-
-	//	public void DeleteFlashCardProblem(int index)
-	//	{
-	//		FlashCardProblems.RemoveAt(index);
-	//	}
-	//}
 }
