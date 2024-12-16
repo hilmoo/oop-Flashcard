@@ -1,5 +1,6 @@
-@page "/d/{id}"
+@page "/decks/{Slug}"
 @layout flashcard.Components.Layout.DetailLayout
+@inject flashcard.utils.FlashCardService FlashCardService
 @rendermode InteractiveServer
 
 <div class="h-screen w-screen">
@@ -16,7 +17,7 @@
 					<span class="text-lg font-semibold">Nama Soal</span>
 				</div>
 				<div>
-					<span class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soalll.Count</span>
+					<span class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soal.Count</span>
 				</div>
 			</div>
 		</div>
@@ -28,7 +29,7 @@
 				<div class="flex flex-col gap-3 p-10 justify-center bg-secondary w-full h-full items-center">
 					<p class="text-3xl text-center">
 						Ini judul
-						@Id
+						@Slug
 					</p>
 					<p class="text-lg line-clamp-6 text-center">
 						Lorem ipsum dolor sit amet consectetur, adipisicing elit. Culpa amet dolore commodi, autem incidunt
@@ -52,13 +53,13 @@
 					<div class="flipcard-front bg-secondary">
 						problem
 						<article class="prose lg:prose-xl">
-							@soalll[currentIndex].Question
+							@soal[currentIndex].Question
 						</article>
 					</div>
 					<div class="flipcard-back bg-secondary">
 						Answer
 						<article class="prose lg:prose-xl">
-							@soalll[currentIndex].Answer
+							@soal[currentIndex].Answer
 						</article>
 					</div>
 				</div>

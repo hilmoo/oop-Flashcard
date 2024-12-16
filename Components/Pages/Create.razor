@@ -11,13 +11,13 @@
 			<span class="label-text">Deck name</span>
 		</div>
 		<input type="text" placeholder="Type deck name" class="input input-bordered w-full rounded-lg"
-					 @onchange="HandleDeckName" />
+			   @bind="deckName" />
 	</div>
 	<div class="form-control w-full">
 		<div class="label">
 			<span class="label-text">Deck category</span>
 		</div>
-		<select class="select select-bordered rounded-lg max-[480px]:w-full" @onchange="HandleSelectCategory">
+		<select class="select select-bordered rounded-lg max-[480px]:w-full" @bind="selectedCategory">
 			<option disabled selected>Select Category</option>
 			@foreach (var category in Category.GetCategoriesExceptAll())
 			{
@@ -57,6 +57,10 @@
 				</tbody>
 			</table>
 		</div>
+		<button class="btn rounded-lg w-full" onclick="finalize_modal.showModal()"
+				disabled="@(FlashCardService.FlashCardProblems.Count == 0)">
+			Finalize Cards
+		</button>
 	</div>
 </div>
 <dialog id="aaaaaa" class="modal modal-bottom sm:modal-middle">
@@ -76,9 +80,35 @@
 						Discard
 					</button>
 				</div>
-				<button type="submit" class="btn btn-sm btn-success rounded-md" @onclick="HandleSave">Save</button>
+				<button class="btn btn-sm btn-success rounded-md" @onclick="HandleSave">Save</button>
 			</div>
 		</form>
+	</div>
+</dialog>
+
+<!-- Finalize Modal -->
+<dialog id="finalize_modal" class="modal modal-bottom sm:modal-middle">
+	<div class="modal-box">
+		<h3 class="text-lg font-bold">Finalize Deck</h3>
+		<div class="py-4">
+			<p>Are you sure you want to create this deck with @FlashCardService.FlashCardProblems.Count cards?</p>
+			<div class="mt-2">
+				<p><strong>Deck Name:</strong> @deckName</p>
+				<p><strong>Category:</strong> @selectedCategory</p>
+			</div>
+		</div>
+		<div class="modal-action">
+			<form method="dialog" class="flex gap-2">
+				<button class="btn btn-ghost" onclick="finalize_modal.close()">Cancel</button>
+				<button class="btn btn-primary" @onclick="HandleFinalize" disabled="@isSubmitting">
+					@if (isSubmitting)
+					{
+						<span class="loading loading-spinner"></span>
+					}
+					Create Deck
+				</button>
+			</form>
+		</div>
 	</div>
 </dialog>
 

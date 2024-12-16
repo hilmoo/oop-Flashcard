@@ -1,35 +1,60 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Authentication;
+//using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using flashcard.utils;
+//using Supabase.Storage;
+using flashcard.model.Entities;
 
 namespace flashcard.Components.Pages
 {
 	public partial class Create : ComponentBase
 	{
-        [CascadingParameter]
-        public required HttpContext HttpContext { get; set; }
+		[Inject]
+		private Supabase.Client _supabaseClient { get; set; } = default!;
+
+		[CascadingParameter]
+        private Task<AuthenticationState>? AuthenticationState { get; set; }
 
         [Inject]
-        public NavigationManager NavigationManager { get; set; }
+        public required NavigationManager NavigationManager { get; set; }
 
-		protected override async Task OnInitializedAsync()
+		//[Inject]
+		//private FlashCardService StateService { get; set; }
+
+		private string deckName
 		{
-			if (!HttpContext.User.Identity!.IsAuthenticated)
-			{
-				NavigationManager.NavigateTo("/auth/signin");
-				return;
-			}
+			get => FlashCardService.DeckName;
+			set => FlashCardService.DeckName = value;
 		}
 
-        private string deckName = string.Empty;
-		private void HandleDeckName(ChangeEventArgs e)
+		private string selectedCategory
 		{
-			deckName = e.Value?.ToString() ?? string.Empty;
+			get => FlashCardService.SelectedCategory;
+			set => FlashCardService.SelectedCategory = value;
 		}
-		private string selectedCategory = string.Empty;
-		private void HandleSelectCategory(ChangeEventArgs e)
-		{
-			selectedCategory = e.Value?.ToString() ?? string.Empty;
-		}
+
+		private bool isSubmitting = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            var authState = await AuthenticationState!;
+            if (!authState.User.Identity!.IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("/auth/signin");
+                return;
+            }
+        }
+
+        //private string deckName = string.Empty;
+		//private void HandleDeckName(ChangeEventArgs e)
+		//{
+		//	deckName = e.Value?.ToString() ?? string.Empty;
+		//}
+		//private string selectedCategory = string.Empty;
+		//private void HandleSelectCategory(ChangeEventArgs e)
+		//{
+		//	selectedCategory = e.Value?.ToString() ?? string.Empty;
+		//}
 
 		private string tempQuestion = string.Empty;
 		private string tempAnswer = string.Empty;
@@ -56,6 +81,7 @@ namespace flashcard.Components.Pages
 				AddFlashCardProblem(tempQuestion, tempAnswer);
 				tempQuestion = string.Empty;
 				tempAnswer = string.Empty;
+
 			}
 		}
 		private void AddFlashCardProblem(string question, string answer)
@@ -67,5 +93,51 @@ namespace flashcard.Components.Pages
 		{
 			FlashCardService.DeleteFlashCardProblem(Index);
 		}
-	}
+        private async Task HandleFinalize()
+        {
+            if (string.IsNullOrWhiteSpace(deckName) || string.IsNullOrWhiteSpace(selectedCategory))
+            {
+                // Show error message
+                return;
+            }
+
+            if (FlashCardService.FlashCardProblems.Count == 0)
+            {
+                // Show error message
+                return;
+            }
+
+            isSubmitting = true;
+
+			try
+            {
+				var authState = await AuthenticationState!;
+				var user = authState.User;
+				string userEmail = user.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value ?? "No email";
+
+				Console.WriteLine(userEmail);
+				if (string.IsNullOrEmpty(userEmail))
+					throw new Exception("User email is not available.");
+
+				var accountData = await _supabaseClient.From<SupabaseAccount>()
+                    .Where(x => x.Email == userEmail)
+                    .Single();
+
+                Console.WriteLine("Account ID: " + accountData!.Id);
+                //var accountId = int.Parse(authState.User.FindFirst("sub")?.Value ?? "0");
+
+                await FlashCardService.SaveDeckToSupabase(deckName, selectedCategory, accountData!.Id);
+                NavigationManager.NavigateTo("/");
+            }
+            catch (Exception ex)
+            {
+                // Handle error
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                isSubmitting = false;
+            }
+        }
+    }
 }

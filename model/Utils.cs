@@ -1,3 +1,4 @@
+using Supabase;
 namespace flashcard.model
 {
     public class Category

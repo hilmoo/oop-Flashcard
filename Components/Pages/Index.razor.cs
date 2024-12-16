@@ -1,24 +1,28 @@
 ﻿using flashcard.model;
+using flashcard.model.Entities;
 using flashcard.z_dummydata;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
+using flashcard.utils;
 
 namespace flashcard.Components.Pages
 {
 	public partial class Index : ComponentBase
 	{
+
 		private string searchText = string.Empty;
 		private string selectedCategory = string.Empty;
-		private List<FlashCard> flashCards = [];
-		private List<FlashCard> filteredFlashCards = [];
+		private List<Flashcard> flashCards = [];
+		private List<Flashcard> filteredFlashCards = [];
 		private string? userEmail;
-
 
 		protected override async Task OnInitializedAsync()
 		{
-			flashCards = DummyDataCardBasic.GetFlashCards();
-			filteredFlashCards = flashCards;
+			//flashCards = DummyDataCardBasic.GetFlashCards();
+			flashCards = await FlashCardService.GetAllFlashCards();
+			//Console.WriteLine(flashCards[0].Slug);
+            filteredFlashCards = flashCards;
 			var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 			var user = authState.User;
 

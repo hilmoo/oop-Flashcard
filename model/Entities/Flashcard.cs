@@ -4,7 +4,7 @@ using Supabase.Postgrest.Attributes;
 namespace flashcard.model.Entities
 {
     [Table("flashcards")]
-    class Flashcard : BaseModel
+    public class Flashcard : BaseModel
     {
         [PrimaryKey("id", false)]
         public int Id { get; set; }
@@ -14,6 +14,9 @@ namespace flashcard.model.Entities
 
         [Column("title")]
         public string Title { get; set; }
+
+        [Column("description")]
+        public string Description { get; set; }
 
         [Column("category")]
         public string Category { get; set; }

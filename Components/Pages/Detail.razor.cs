@@ -1,4 +1,5 @@
-﻿using flashcard.model;
+﻿using flashcard.model.Entities;
+using flashcard.utils;
 using flashcard.z_dummydata;
 using Microsoft.AspNetCore.Components;
 
@@ -7,20 +8,21 @@ namespace flashcard.Components.Pages
 	public partial class Detail : ComponentBase
 	{
 		[Parameter]
-		public string? Id { get; set; }
+		public string? Slug { get; set; }
 
-		private List<FlashCardProblem> soalll = [];
+		//private List<FlashCardProblem> soalll = [];
+		private List<Problem> soal = [];
 		private int currentIndex = 0;
 		private bool IsStart { get; set; } = false;
 
-		protected override void OnInitialized()
+		protected override async Task OnInitializedAsync()
 		{
-			soalll = DummyDataCardBasic.GetFlashCardProblems();
+			soal = await FlashCardService.GetProblemsByFlashcardSlug(Slug);
 		}
 
 		private void HandleNext()
 		{
-			if (currentIndex < soalll.Count - 1)
+			if (currentIndex < soal.Count - 1)
 			{
 				currentIndex++;
 			}
@@ -36,7 +38,7 @@ namespace flashcard.Components.Pages
 
 		private void ToggleStart() => IsStart = !IsStart;
 
-		private bool CanNavigateNext => currentIndex < soalll.Count - 1;
+		private bool CanNavigateNext => currentIndex < soal.Count - 1;
 		private bool CanNavigatePrev => currentIndex > 0;
 	}
 }
