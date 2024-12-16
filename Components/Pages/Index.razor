@@ -3,6 +3,8 @@
 @using flashcard.model
 @using flashcard.Components.Components
 @using flashcard.Components.Icon
+@using System.Security.Claims
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Flashcard</PageTitle>
 
@@ -33,3 +35,5 @@
 Debug search: @searchText
 <br>
 debug category: @selectedCategory
+<br />
+debug login : @userEmail
