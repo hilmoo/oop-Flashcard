@@ -31,6 +31,8 @@ namespace flashcard.Components.Pages
 			set => FlashCardService.SelectedCategory = value;
 		}
 
+		private string deckVisibility = "Public";
+
 		private bool isSubmitting = false;
 
         protected override async Task OnInitializedAsync()
@@ -122,9 +124,9 @@ namespace flashcard.Components.Pages
                     .Single();
 
                 Console.WriteLine("Account ID: " + accountData!.Id);
-                //var accountId = int.Parse(authState.User.FindFirst("sub")?.Value ?? "0");
+				Console.WriteLine("Deck Visibility: " + deckVisibility);
 
-                await FlashCardService.SaveDeckToSupabase(deckName, selectedCategory, accountData!.Id);
+				await FlashCardService.SaveDeckToSupabase(deckName, selectedCategory, accountData!.Id, deckVisibility);
                 NavigationManager.NavigateTo("/");
             }
             catch (Exception ex)

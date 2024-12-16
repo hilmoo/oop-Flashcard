@@ -27,7 +27,7 @@ namespace flashcard.utils
 			FlashCardProblems.RemoveAt(index);
 		}
 
-		public async Task SaveDeckToSupabase(string title, string category, int accountId)
+		public async Task SaveDeckToSupabase(string title, string category, int accountId, string deckVisibility)
 		{
 			// Create slug from title
 			string slug = title.ToLower().Replace(" ", "-");
@@ -41,7 +41,8 @@ namespace flashcard.utils
 				Title = title,
 				Category = category,
 				TotalQuestion = FlashCardProblems.Count,
-				AccountId = accountId
+				AccountId = accountId,
+				Visibility = deckVisibility
 			};
 
 			var savedFlashcard = await _supabaseClient.From<Flashcard>()

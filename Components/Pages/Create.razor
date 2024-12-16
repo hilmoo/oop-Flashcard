@@ -98,6 +98,17 @@
 				<p><strong>Deck Name:</strong> @deckName</p>
 				<p><strong>Category:</strong> @selectedCategory</p>
 			</div>
+			<div class="mt-4">
+                <p><strong>Visibility:</strong></p>
+                <div class="flex gap-4">
+                    <label class="cursor-pointer">
+						<input type="radio" name="visibility" checked="@(deckVisibility == "public")" @onclick="@(() => deckVisibility = "public")" class="radio" /> Public
+                    </label>
+                    <label class="cursor-pointer">
+						<input type="radio" name="visibility" checked="@(deckVisibility == "private")" @onclick="@(() => deckVisibility = "private")" class="radio" /> Private
+                    </label>
+                </div>
+            </div>
 		</div>
 		<div class="modal-action">
 			<form method="dialog" class="flex gap-2">

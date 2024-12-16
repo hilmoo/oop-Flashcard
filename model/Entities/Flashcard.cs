@@ -26,5 +26,8 @@ namespace flashcard.model.Entities
 
         [Column("account_id")]
         public int AccountId { get; set; }
-    }
+
+        [Column("visibility")]
+		public string Visibility { get; set; }
+	}
 }
