@@ -1,21 +1,23 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace flashcard.Components.Pages
 {
 	public partial class Create : ComponentBase
 	{
-		[CascadingParameter]
-		public required HttpContext HttpContext { get; set; }
-
 		[Inject]
 		public required NavigationManager NavigationManager { get; set; }
 
-		protected override void OnInitialized()
+		private AuthenticationState? _authenticationState;
+
+		protected override async Task OnInitializedAsync()
 		{
-			if (!HttpContext.User.Identity!.IsAuthenticated)
+			_authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+			var user = _authenticationState.User;
+
+			if (user.Identity == null || !user.Identity.IsAuthenticated)
 			{
 				NavigationManager.NavigateTo("/auth/signin");
-				return;
 			}
 		}
 
