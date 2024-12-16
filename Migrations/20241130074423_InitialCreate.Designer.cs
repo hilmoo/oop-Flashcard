@@ -10,9 +10,9 @@ using flashcard.Data;
 
 namespace flashcard.Migrations
 {
-    [DbContext(typeof(FlashcardDbContext))]
-    [Migration("20241130032937_InitCreate")]
-    partial class InitCreate
+    [DbContext(typeof(DataContext))]
+    [Migration("20241130074423_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

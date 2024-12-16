@@ -4,6 +4,21 @@ namespace flashcard.Components.Pages
 {
 	public partial class Create : ComponentBase
 	{
+		[CascadingParameter]
+		public required HttpContext HttpContext { get; set; }
+
+		[Inject]
+		public required NavigationManager NavigationManager { get; set; }
+
+		protected override void OnInitialized()
+		{
+			if (!HttpContext.User.Identity!.IsAuthenticated)
+			{
+				NavigationManager.NavigateTo("/auth/signin");
+				return;
+			}
+		}
+
 		private string deckName = string.Empty;
 		private void HandleDeckName(ChangeEventArgs e)
 		{

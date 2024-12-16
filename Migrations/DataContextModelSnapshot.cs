@@ -9,8 +9,8 @@ using flashcard.Data;
 
 namespace flashcard.Migrations
 {
-    [DbContext(typeof(FlashcardDbContext))]
-    partial class FlashcardDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DataContext))]
+    partial class DataContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

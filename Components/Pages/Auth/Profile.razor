@@ -1,0 +1,46 @@
+@page "/profile"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager Navigation
+@inject IAuthenticationService AuthenticationService
+@rendermode InteractiveServer
+
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">User Profile</h2>
+            
+            @if (isAuthenticated)
+            {
+                <!-- User Information -->
+                <div class="space-y-4">
+                    <div>
+                        <span class="text-gray-600 font-medium">Name:</span>
+                        <span class="ml-2 text-gray-800">@userName</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 font-medium">Email:</span>
+                        <span class="ml-2 text-gray-800">@userEmail</span>
+                    </div>
+                </div>
+                
+                <!-- Logout Button -->
+                <div class="mt-6 text-center">
+                    <a href="/auth/signout" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition">
+                        Sign Out
+                    </a>
+                </div>
+            }
+            else
+            {
+                <p class="text-center text-gray-600">You are not signed in.</p>
+                <div class="text-center mt-4">
+                    <a href="/auth/signin" class="text-blue-500 hover:underline">Sign In</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
