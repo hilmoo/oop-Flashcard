@@ -11,7 +11,6 @@ DotEnv.Load(dotenv);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -40,10 +39,10 @@ builder.Services.AddAuthentication("Cookies")
 
 builder.Services.AddSingleton<Supabase.Client>(serviceProvider =>
 {
-    var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL") ?? throw new InvalidOperationException("SUPABASE_URL not set");
-    var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_ANON_KEY") ?? throw new InvalidOperationException("SUPABASE_ANON_KEY not set");
+	var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL") ?? throw new InvalidOperationException("SUPABASE_URL not set");
+	var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_ANON_KEY") ?? throw new InvalidOperationException("SUPABASE_ANON_KEY not set");
 
-    return new Supabase.Client(supabaseUrl, supabaseKey);
+	return new Supabase.Client(supabaseUrl, supabaseKey);
 });
 
 builder.Services.AddSingleton<FlashCardService>();
