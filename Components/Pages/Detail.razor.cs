@@ -1,9 +1,8 @@
-﻿using flashcard.model;
-using flashcard.model.Entities;
+﻿using flashcard.model.Entities;
 using flashcard.utils;
-using flashcard.z_dummydata;
 using Microsoft.AspNetCore.Components;
-using Supabase.Interfaces;
+using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace flashcard.Components.Pages
 {
@@ -12,7 +11,8 @@ namespace flashcard.Components.Pages
 		[Parameter]
 		public string? Slug { get; set; }
 
-		//private List<FlashCardProblem> soalll = [];
+		private bool isFirstRender = true;
+
 		private List<Problem> soal = [];
 		private Flashcard? deckData;
 		private string? author;
@@ -25,20 +25,68 @@ namespace flashcard.Components.Pages
 			deckData = await FlashCardService.GetFlashcardBySlug(Slug);
 		}
 
-		private void HandleNext()
+		protected override async Task OnAfterRenderAsync(bool firstRender)
+		{
+			if (firstRender)
+			{
+				await LoadSavedState();
+				isFirstRender = false;
+				StateHasChanged();
+			}
+		}
+
+		private async Task HandleNext()
 		{
 			if (currentIndex < soal.Count - 1)
 			{
 				currentIndex++;
+				await SaveStateToLocalStorage();
 			}
 		}
 
-		private void HandlePrev()
+		private async Task HandlePrev()
 		{
 			if (currentIndex > 0)
 			{
 				currentIndex--;
+				await SaveStateToLocalStorage();
 			}
+		}
+
+		private class SavedState
+		{
+			public string? Slug { get; set; }
+			public int CurrentIndex { get; set; }
+		}
+
+		private async Task LoadSavedState()
+		{
+			try
+			{
+				var savedState = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"flashcard_state_{Slug}");
+				if (!string.IsNullOrEmpty(savedState))
+				{
+					var state = JsonSerializer.Deserialize<SavedState>(savedState);
+					if (state != null && state.Slug == Slug)
+					{
+						currentIndex = state.CurrentIndex;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+		}
+
+		private async Task SaveStateToLocalStorage()
+		{
+			var state = new SavedState
+			{
+				Slug = Slug,
+				CurrentIndex = currentIndex
+			};
+			await JSRuntime.InvokeVoidAsync("localStorage.setItem", $"flashcard_state_{Slug}", JsonSerializer.Serialize(state));
 		}
 
 		private void ToggleStart() => IsStart = !IsStart;
