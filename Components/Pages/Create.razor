@@ -1,11 +1,9 @@
 @page "/create"
-@attribute [Authorize]
 @using Microsoft.AspNetCore.Components.Authorization
 @using flashcard.model
 @using flashcard.utils
-@using Microsoft.AspNetCore.Authorization
 @inject FlashCardService FlashCardService
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject  NavigationManager Navigation
 @rendermode InteractiveServer
 
 <PageTitle>Create a Flashcard</PageTitle>

@@ -4,6 +4,19 @@ namespace flashcard.Components.Pages
 {
     public partial class Create : ComponentBase
     {
+        [CascadingParameter] public required HttpContext HttpContext { get; set; }
+
+        protected override Task OnInitializedAsync()
+        {
+            if (!HttpContext.User.Identity!.IsAuthenticated)
+            {
+                Console.WriteLine("User is not authenticated");
+                Navigation.NavigateTo("/auth/signin");
+            }
+
+            return Task.CompletedTask;
+        }
+
         private string deckName = string.Empty;
 
         private void HandleDeckName(ChangeEventArgs e)
