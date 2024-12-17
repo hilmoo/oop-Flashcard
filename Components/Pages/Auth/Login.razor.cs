@@ -10,9 +10,9 @@ namespace flashcard.Components.Pages.Auth
 
         protected override async Task OnInitializedAsync()
         {
-            if (!HttpContext.User.Identity!.IsAuthenticated)
+            if (HttpContext.User.Identity!.IsAuthenticated)
             {
-                Console.WriteLine("User is not authenticated");
+                Console.WriteLine("User is authenticated");
                 Navigation.NavigateTo("/");
                 return;
             }
