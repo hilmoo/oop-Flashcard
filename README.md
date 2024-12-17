@@ -10,7 +10,7 @@ An over-engineered flashcard platform designed to help users better remember spe
 - Free to Use
 
 ## Access the Platform
-Visit [oop.hilmo.my.id](oop.hilmo.my.id)
+Visit [oop.hilmo.my.id](https://oop.hilmo.my.id)
 
 ## How to Set Up and Build
 
