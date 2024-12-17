@@ -1,41 +1,29 @@
 ﻿@inherits LayoutComponentBase
 @using flashcard.Components.Icon
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authorization
-@inject NavigationManager Navigation
-@inject IHttpContextAccessor HttpContextAccessor
-@inject IAuthenticationService AuthenticationService
+@using flashcard.Components.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="drawer">
-	<input id="drawerMain" type="checkbox" class="drawer-toggle" />
+	<input id="drawerMain" type="checkbox" class="drawer-toggle"/>
 	<div class="drawer-content">
-		<nav class="border-b border-gray-600">
-			<div class="mx-auto px-2 sm:px-10">
-				<div class="relative flex h-16 justify-between">
-					<div class="flex items-center gap-4 ">
-						<label for="drawerMain" class="btn btn-ghost drawer-button min-[400px]:hidden">
-							<MenuIcon />
-						</label>
-						<a href="/">
-							<div class="flex shrink-0 items-center">
-								<img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-									 alt="Your Company">
-							</div>
-						</a>
-					</div>
-					<div class="items-center flex max-[400px]:hidden">
-						<div class="ml-10 flex items-baseline space-x-4">
-							<a href="/create" class="btn btn-ghost rounded-md">Create</a>
-							@if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                            {
-                                <a href="/profile" class="btn btn-ghost rounded-md">Profile</a>
-                            }
-                            else
-                            {
-                                <a href="/auth/signin" class="btn btn-ghost rounded-md">Sign In</a>
-                            }
-						</div>
-					</div>
+		<nav class="navbar rounded-box border-b border-gray-600">
+			<div class="flex-1 px-2 lg:flex-none">
+				<a class="text-lg font-bold">daisyUI</a>
+			</div>
+			<div class="flex flex-1 justify-end px-2">
+				<div class="flex items-stretch">
+					<a href="/create" class="btn btn-ghost rounded-md ">Create</a>
+					<a href="/create" class="hidden sm:btn sm:btn-ghost sm:rounded-md">My Bookmark</a>
+					<a href="/create" class="hidden sm:btn sm:btn-ghost sm:rounded-md">My Deck</a>
+					<AuthorizeView>
+						<Authorized>
+							<AvatarComponent Profile="@userProfile"/>
+						</Authorized>
+						<NotAuthorized>
+							<a href="/auth/signin" class="btn btn-ghost rounded-md">Sign In</a>
+						</NotAuthorized>
+					</AuthorizeView>
 				</div>
 			</div>
 		</nav>
