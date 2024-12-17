@@ -1,8 +1,9 @@
+using System.Security.Claims;
 using flashcard.Components;
 using flashcard.Data;
 using flashcard.utils;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 
 var root = Directory.GetCurrentDirectory();
@@ -10,49 +11,75 @@ var dotenv = Path.Combine(root, ".env");
 DotEnv.Load(dotenv);
 
 var builder = WebApplication.CreateBuilder(args);
+var logging = builder.Logging;
+var services = builder.Services;
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+logging.ClearProviders();
+logging.AddConsole();
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddRazorComponents()
-		.AddInteractiveServerComponents();
+services.AddHttpContextAccessor();
+services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
-builder.Services.AddDbContextFactory<DataContext>(options =>
-{
-	options.UseNpgsql(PostgresConstants.ConnectionString);
-});
+services.AddDbContextFactory<DataContext>(options => { options.UseNpgsql(PostgresConstants.ConnectionString); });
+services.AddSingleton<FlashCardService>();
+services.AddTransient<DbAccountServices>();
 
+services.AddAuthentication("Cookies")
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = AuthenticationConstants.CookieName;
+        options.Cookie.MaxAge = TimeSpan.FromDays(1);
+    }).AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") ??
+                                 throw new InvalidOperationException(
+                                     "GOOGLE_CLIENT_ID is not set in the environment variables.");
+        googleOptions.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ??
+                                     throw new InvalidOperationException(
+                                         "GOOGLE_CLIENT_SECRET is not set in the environment variables.");
+        googleOptions.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+        googleOptions.SaveTokens = true;
+        googleOptions.Events.OnCreatingTicket = ctx =>
+        {
+            List<AuthenticationToken> tokens = ctx.Properties.GetTokens().ToList();
 
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
-builder.Services.AddAuthentication("Cookies")
-	.AddCookie(options =>
-	{
-		options.Cookie.Name = AuthenticationConstants.CookieName;
-		options.Cookie.MaxAge = TimeSpan.FromDays(1);
-	}).AddGoogle(googleOpt =>
-	{
-		googleOpt.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") ?? throw new InvalidOperationException("GOOGLE_CLIENT_ID is not set in the environment variables.");
-		googleOpt.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? throw new InvalidOperationException("GOOGLE_CLIENT_SECRET is not set in the environment variables.");
-	});
+            tokens.Add(new AuthenticationToken()
+            {
+                Name = "TicketCreated",
+                Value = DateTime.UtcNow.ToString()
+            });
 
-builder.Services.AddSingleton<Supabase.Client>(serviceProvider =>
-{
-	var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL") ?? throw new InvalidOperationException("SUPABASE_URL not set");
-	var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_ANON_KEY") ?? throw new InvalidOperationException("SUPABASE_ANON_KEY not set");
+            ctx.Properties.StoreTokens(tokens);
 
-	return new Supabase.Client(supabaseUrl, supabaseKey);
-});
+            if (ctx.Principal == null)
+            {
+                return Task.CompletedTask; // TODO: add handler
+            }
 
-builder.Services.AddSingleton<FlashCardService>();
-builder.Services.AddTransient<DbAccountServices>();
+            var email = ctx.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = ctx.Principal.FindFirstValue(ClaimTypes.Name);
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(name))
+            {
+                throw new InvalidOperationException("The email or name cannot be null or empty.");
+            }
+
+            var dbAccountServices = ctx.HttpContext.RequestServices.GetService<DbAccountServices>();
+            if (dbAccountServices == null)
+            {
+                throw new InvalidOperationException("Unable to resolve DbAccountServices from DI container.");
+            }
+
+            dbAccountServices.AddNewAccount(email, name);
+            return Task.CompletedTask;
+        };
+    });
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
 app.UseStaticFiles();
@@ -61,6 +88,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorComponents<App>()
-		.AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode();
 
 app.Run();
