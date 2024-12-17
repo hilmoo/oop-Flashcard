@@ -1,14 +1,14 @@
-<a href="/d/@flashCard?.Slug" class="block p-6 border rounded-lg shadow bg-neutral hover:bg-opacity-90">
+<a href="/d/@FlashCardData?.Slug" class="block p-6 border rounded-lg shadow bg-neutral hover:bg-opacity-90">
     <div class="flex flex-col min-h-[8rem] gap-2">
         <div class="flex grow flex-col gap-5">
             <div class="flex sm:flex-row flex-col sm:items-center justify-between">
-                <p class="text-lg font-semibold ">@flashCard?.Title</p>
-                <p class="text-sm text-gray-400">@flashCard?.Category</p>
+                <p class="text-lg font-semibold ">@FlashCardData?.Title</p>
+                <p class="text-sm text-gray-400">@FlashCardData?.Category</p>
             </div>
-            <p class="text-sm line-clamp-3">@flashCard?.Description</p>
+            <p class="text-sm line-clamp-3">@FlashCardData?.Description</p>
         </div>
         <div class="flex justify-end">
-            <p class="text-sm truncate">@flashCard?.TotalQuestion Question</p>
+            <p class="text-sm truncate">@FlashCardData?.TotalQuestion Question</p>
         </div>
     </div>
 </a>

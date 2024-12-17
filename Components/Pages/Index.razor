@@ -3,7 +3,6 @@
 @using flashcard.model
 @using flashcard.Components.Components
 @using flashcard.Components.Icon
-@using System.Security.Claims
 @inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Flashcard</PageTitle>
@@ -25,9 +24,10 @@
 		</div>
 	</div>
 	<div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+		@* TODO: PINDAHIN BOOKMARK AMA MY DECK KE PROFILE *@
 		@foreach (var flashCard in filteredFlashCards)
 		{
-			<FlashCardComponent flashCard="flashCard" />
+			<FlashCardComponent FlashCardData="flashCard"/>
 		}
 	</div>
 </div>

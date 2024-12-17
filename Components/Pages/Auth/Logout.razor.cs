@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Components;
 
 namespace flashcard.Components.Pages.Auth
@@ -7,8 +6,6 @@ namespace flashcard.Components.Pages.Auth
     public partial class Logout : ComponentBase
     {
         [CascadingParameter] public required HttpContext HttpContext { get; set; }
-
-        [Inject] public required NavigationManager Navigation { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -20,8 +17,9 @@ namespace flashcard.Components.Pages.Auth
             }
 
             var authProperties = new AuthenticationProperties { };
-            var result = TypedResults.SignOut(authProperties, [GoogleDefaults.AuthenticationScheme]);
+            var result = TypedResults.SignOut(authProperties, ["Cookies"]);
             await result.ExecuteAsync(HttpContext);
+            Navigation.NavigateTo("/");
         }
     }
 }
