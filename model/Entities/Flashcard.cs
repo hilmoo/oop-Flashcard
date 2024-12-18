@@ -17,7 +17,7 @@ namespace flashcard.model.Entities
         [Required] [Column("category")] public string? Category { get; set; }
         [Required] [Column("total_question")] public int TotalQuestion { get; set; }
         [Required] [Column("is_public")] public bool IsPublic { get; set; }
-        [Required] [Column("account_id")] public string? GoogleId { get; set; }
+        [Required] [Column("account_id")] public int AccountId { get; set; }
     }
 
     [Table("flashcards_problem")]

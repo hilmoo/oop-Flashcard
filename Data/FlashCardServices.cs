@@ -26,6 +26,10 @@ namespace flashcard.Data
                                .Replace(" ", "-")
                            + "-" + CustomRandom.GenerateRandomString(6);
 
+                var accountId = context.Set<Account>().FirstOrDefault(a => a.GoogleId == flashcardData.GoogleId)?.Id;
+                if (accountId == null)
+                    throw new Exception("Account not found");
+
                 var newFlashCard = new FlashCard
                 {
                     Title = flashcardData.Title,
@@ -33,7 +37,7 @@ namespace flashcard.Data
                     Category = flashcardData.Category,
                     TotalQuestion = flashcardData.TotalQuestion,
                     IsPublic = flashcardData.IsPublic,
-                    GoogleId = flashcardData.GoogleId,
+                    AccountId = accountId.Value,
                     Slug = slug
                 };
 
