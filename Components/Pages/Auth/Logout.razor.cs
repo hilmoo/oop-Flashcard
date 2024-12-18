@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Components;
-using System.Security.Claims;
 
 namespace flashcard.Components.Pages.Auth
 {
     public partial class Logout : ComponentBase
     {
-        [CascadingParameter]
-        public required HttpContext HttpContext { get; set; }
-
-        [Inject]
-        public NavigationManager Navigation { get; set; }
+        [CascadingParameter] public required HttpContext HttpContext { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -22,12 +16,10 @@ namespace flashcard.Components.Pages.Auth
                 return;
             }
 
-            var authProperties = new AuthenticationProperties
-            {
-                RedirectUri = "/google/callback",
-            };
+            var authProperties = new AuthenticationProperties { };
             var result = TypedResults.SignOut(authProperties, ["Cookies"]);
             await result.ExecuteAsync(HttpContext);
+            Navigation.NavigateTo("/");
         }
     }
 }

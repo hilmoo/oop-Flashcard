@@ -11,8 +11,8 @@ namespace flashcard.model.Entities
         [Column("id")]
         public int Id { get; init; }
 
-        [Required]
-        [Column("email")]
-        public string? Email { get; init; }
+        [Required] [Column("email")] public string? Email { get; init; }
+
+        [Required] [Column("name")] public string? Name { get; init; }
     }
 }
