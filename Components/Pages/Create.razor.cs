@@ -9,8 +9,6 @@ namespace flashcard.Components.Pages
 {
     public partial class Create : ComponentBase
     {
-        [CascadingParameter] private Task<AuthenticationState>? AuthenticationState { get; set; }
-
         private string? DeckName { get; set; }
         private string? DeckDescription { get; set; }
         private string? SelectedCategory { get; set; }
@@ -22,7 +20,7 @@ namespace flashcard.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            var authState = await AuthenticationState!;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             if (!authState.User.Identity!.IsAuthenticated)
             {
                 Navigation.NavigateTo("/auth/signin");
@@ -84,7 +82,7 @@ namespace flashcard.Components.Pages
 
             try
             {
-                var authState = await AuthenticationState!;
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var user = authState.User;
                 var googleId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
