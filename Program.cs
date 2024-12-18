@@ -1,10 +1,11 @@
 using System.Security.Claims;
 using flashcard.Components;
 using flashcard.Data;
+using flashcard.model.Entities;
 using flashcard.utils;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Entities_Account = flashcard.model.Entities.Account;
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
@@ -22,8 +23,7 @@ services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 services.AddDbContextFactory<DataContext>(options => { options.UseNpgsql(PostgresConstants.ConnectionString); });
-services.AddSingleton<FlashCardService>();
-services.AddTransient<DbAccountServices>();
+services.AddTransient<AccountServices>();
 
 services.AddAuthentication("Cookies")
     .AddCookie(options =>
@@ -42,7 +42,7 @@ services.AddAuthentication("Cookies")
         googleOptions.SaveTokens = true;
         googleOptions.Events.OnCreatingTicket = ctx =>
         {
-            List<AuthenticationToken> tokens = ctx.Properties.GetTokens().ToList();
+            var tokens = ctx.Properties.GetTokens().ToList();
 
             tokens.Add(new AuthenticationToken()
             {
@@ -59,18 +59,39 @@ services.AddAuthentication("Cookies")
 
             var email = ctx.Principal.FindFirstValue(ClaimTypes.Email);
             var name = ctx.Principal.FindFirstValue(ClaimTypes.Name);
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(name))
+            var googleId = ctx.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Validate essential claims
+            if (string.IsNullOrWhiteSpace(email))
             {
-                throw new InvalidOperationException("The email or name cannot be null or empty.");
+                throw new InvalidOperationException("Email claim is missing or empty.");
             }
 
-            var dbAccountServices = ctx.HttpContext.RequestServices.GetService<DbAccountServices>();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new InvalidOperationException("Name claim is missing or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(googleId))
+            {
+                throw new InvalidOperationException("GoogleId claim is missing or empty.");
+            }
+
+            // Create a new account object
+            var newAccount = new Entities_Account()
+            {
+                Email = email,
+                Name = name,
+                GoogleId = googleId
+            };
+
+            var dbAccountServices = ctx.HttpContext.RequestServices.GetService<AccountServices>();
             if (dbAccountServices == null)
             {
                 throw new InvalidOperationException("Unable to resolve DbAccountServices from DI container.");
             }
 
-            dbAccountServices.AddNewAccount(email, name);
+            dbAccountServices.AddNewAccount(newAccount);
             return Task.CompletedTask;
         };
     });

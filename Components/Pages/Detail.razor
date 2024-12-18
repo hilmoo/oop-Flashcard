@@ -1,6 +1,7 @@
 @page "/decks/{Slug}"
+@using flashcard.Data
 @layout flashcard.Components.Layout.DetailLayout
-@inject flashcard.utils.FlashCardService FlashCardService
+@inject FlashCardService FlashCardService
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 

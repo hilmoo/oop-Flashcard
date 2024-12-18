@@ -1,38 +1,33 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Security.Claims;
+using flashcard.model;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using flashcard.utils;
+using flashcard.model.Entities;
 
 namespace flashcard.Components.Pages
 {
     public partial class Create : ComponentBase
     {
-        [CascadingParameter] public required HttpContext HttpContext { get; set; }
+        [CascadingParameter] private Task<AuthenticationState>? AuthenticationState { get; set; }
 
-        protected override Task OnInitializedAsync()
-        {
-            if (!HttpContext.User.Identity!.IsAuthenticated)
-            {
-                Console.WriteLine("User is not authenticated");
-                Navigation.NavigateTo("/auth/signin");
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private string deckName = string.Empty;
-
-        private void HandleDeckName(ChangeEventArgs e)
-        {
-            deckName = e.Value?.ToString() ?? string.Empty;
-        }
-
-        private string selectedCategory = string.Empty;
-
-        private void HandleSelectCategory(ChangeEventArgs e)
-        {
-            selectedCategory = e.Value?.ToString() ?? string.Empty;
-        }
-
+        private string? DeckName { get; set; }
+        private string? DeckDescription { get; set; }
+        private string? SelectedCategory { get; set; }
+        private bool deckVisibility = true;
+        private bool isSubmitting = false;
         private string tempQuestion = string.Empty;
         private string tempAnswer = string.Empty;
+        private List<FlashCardProblem> flashCardProblems = [];
+
+        protected override async Task OnInitializedAsync()
+        {
+            var authState = await AuthenticationState!;
+            if (!authState.User.Identity!.IsAuthenticated)
+            {
+                Navigation.NavigateTo("/auth/signin");
+            }
+        }
 
         private void HandleQuestionChange(ChangeEventArgs e)
         {
@@ -62,12 +57,65 @@ namespace flashcard.Components.Pages
 
         private void AddFlashCardProblem(string question, string answer)
         {
-            FlashCardService.AddFlashCardProblem(question, answer);
+            flashCardProblems.Add(new FlashCardProblem { Question = question, Answer = answer });
         }
 
-        private void DeleteFlashCardProblem(int Index)
+        private void DeleteFlashCardProblem(int index)
         {
-            FlashCardService.DeleteFlashCardProblem(Index);
+            flashCardProblems.RemoveAt(index);
+        }
+
+        private async Task HandleFinalize()
+        {
+            if (string.IsNullOrWhiteSpace(DeckName) || string.IsNullOrWhiteSpace(SelectedCategory) ||
+                string.IsNullOrWhiteSpace(DeckDescription))
+            {
+                // Show error message
+                return;
+            }
+
+            if (flashCardProblems.Count == 0)
+            {
+                // Show error message
+                return;
+            }
+
+            isSubmitting = true;
+
+            try
+            {
+                var authState = await AuthenticationState!;
+                var user = authState.User;
+                var googleId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrWhiteSpace(googleId))
+                {
+                    // Show error message
+                    return;
+                }
+
+                var newDeck = new FlashCardBase
+                {
+                    Title = DeckName,
+                    Description = DeckDescription,
+                    Category = SelectedCategory,
+                    TotalQuestion = flashCardProblems.Count,
+                    IsPublic = deckVisibility,
+                    GoogleId = googleId,
+                };
+
+                await FlashCardService.CreateNewFlashCard(newDeck, flashCardProblems);
+                Navigation.NavigateTo("/");
+            }
+            catch (Exception ex)
+            {
+                // Handle error
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                isSubmitting = false;
+            }
         }
     }
 }

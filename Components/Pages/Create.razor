@@ -1,9 +1,10 @@
 @page "/create"
+@using flashcard.Data
 @using Microsoft.AspNetCore.Components.Authorization
 @using flashcard.model
 @using flashcard.utils
 @inject FlashCardService FlashCardService
-@inject  NavigationManager Navigation
+@inject NavigationManager Navigation
 @rendermode InteractiveServer
 
 <PageTitle>Create a Flashcard</PageTitle>
@@ -13,13 +14,20 @@
 			<span class="label-text">Deck name</span>
 		</div>
 		<input type="text" placeholder="Type deck name" class="input input-bordered w-full rounded-lg"
-			   @bind="deckName" />
+		       @bind="DeckName"/>
+	</div>
+	<div class="form-control w-full">
+		<div class="label">
+			<span class="label-text">Deck description</span>
+		</div>
+		<input type="text" placeholder="Type deck name" class="input input-bordered w-full rounded-lg"
+		       @bind="DeckDescription"/>
 	</div>
 	<div class="form-control w-full">
 		<div class="label">
 			<span class="label-text">Deck category</span>
 		</div>
-		<select class="select select-bordered rounded-lg max-[480px]:w-full" @bind="selectedCategory">
+		<select class="select select-bordered rounded-lg max-[480px]:w-full" @bind="SelectedCategory">
 			<option disabled selected>Select Category</option>
 			@foreach (var category in Category.GetCategoriesExceptAll())
 			{
@@ -32,35 +40,35 @@
 		<div class="overflow-x-auto">
 			<table class="table table-auto">
 				<thead>
-					<tr>
-						<th></th>
-						<th>Del</th>
-						<th>Question</th>
-						<th>Answer</th>
-					</tr>
+				<tr>
+					<th></th>
+					<th>Del</th>
+					<th>Question</th>
+					<th>Answer</th>
+				</tr>
 				</thead>
 				<tbody>
-					@for (int i = 0; i < FlashCardService.FlashCardProblems.Count; i++)
-					{
-						var problem = FlashCardService.FlashCardProblems[i];
-						var currentIndex = i;
-						<tr class="hover">
-							<th>@(i + 1)</th>
-							<td>
-								<div class="cursor-pointer bg-transparent"
-										 @onclick="() => DeleteFlashCardProblem(currentIndex)">
-									<flashcard.Components.Icon.IconDelete />
-								</div>
-							</td>
-							<td class="truncate">@problem.Question</td>
-							<td class="truncate">@problem.Answer</td>
-						</tr>
-					}
+				@for (var i = 0; i < flashCardProblems.Count; i++)
+				{
+					var problem = flashCardProblems[i];
+					var currentIndex = i;
+					<tr class="hover">
+						<th>@(i + 1)</th>
+						<td>
+							<div class="cursor-pointer bg-transparent"
+							     @onclick="() => DeleteFlashCardProblem(currentIndex)">
+								<flashcard.Components.Icon.IconDelete/>
+							</div>
+						</td>
+						<td class="truncate">@problem.Question</td>
+						<td class="truncate">@problem.Answer</td>
+					</tr>
+				}
 				</tbody>
 			</table>
 		</div>
 		<button class="btn rounded-lg w-full" onclick="finalize_modal.showModal()"
-				disabled="@(FlashCardService.FlashCardProblems.Count == 0)">
+		        disabled="@(flashCardProblems.Count == 0)">
 			Finalize Cards
 		</button>
 	</div>
@@ -71,14 +79,14 @@
 			<h3 class="text-lg font-bold">New Card</h3>
 			<div class="flex flex-col gap-5 py-3">
 				<textarea class="textarea textarea-bordered" placeholder="Question" @onchange="HandleQuestionChange"
-									required></textarea>
+				          required></textarea>
 				<textarea class="textarea textarea-bordered" placeholder="Answer" @onchange="HandleAnswerChange"
-									required></textarea>
+				          required></textarea>
 			</div>
 			<div class="flex flex-row justify-between">
 				<div onclick="aaaaaa.close()">
 					<button type="button" class="btn btn-sm btn-error text-white rounded-md"
-									@onclick="HandleDiscard">
+					        @onclick="HandleDiscard">
 						Discard
 					</button>
 				</div>
@@ -93,22 +101,24 @@
 	<div class="modal-box">
 		<h3 class="text-lg font-bold">Finalize Deck</h3>
 		<div class="py-4">
-			<p>Are you sure you want to create this deck with @FlashCardService.FlashCardProblems.Count cards?</p>
+			<p>Are you sure you want to create this deck with @flashCardProblems.Count cards?</p>
 			<div class="mt-2">
-				<p><strong>Deck Name:</strong> @deckName</p>
-				<p><strong>Category:</strong> @selectedCategory</p>
+				<p><strong>Deck Name:</strong> @DeckName</p>
+				<p><strong>Category:</strong> @SelectedCategory</p>
 			</div>
 			<div class="mt-4">
-                <p><strong>Visibility:</strong></p>
-                <div class="flex gap-4">
-                    <label class="cursor-pointer">
-						<input type="radio" name="visibility" checked="@(deckVisibility == "public")" @onclick="@(() => deckVisibility = "public")" class="radio" /> Public
-                    </label>
-                    <label class="cursor-pointer">
-						<input type="radio" name="visibility" checked="@(deckVisibility == "private")" @onclick="@(() => deckVisibility = "private")" class="radio" /> Private
-                    </label>
-                </div>
-            </div>
+				<p><strong>Visibility:</strong></p>
+				<div class="flex gap-4">
+					<label class="cursor-pointer">
+						<input type="radio" name="visibility" checked="@(deckVisibility == true)"
+						       @onclick="@(() => deckVisibility = true)" class="radio"/> Public
+					</label>
+					<label class="cursor-pointer">
+						<input type="radio" name="visibility" checked="@(deckVisibility == false)"
+						       @onclick="@(() => deckVisibility = false)" class="radio"/> Private
+					</label>
+				</div>
+			</div>
 		</div>
 		<div class="modal-action">
 			<form method="dialog" class="flex gap-2">
@@ -125,22 +135,22 @@
 	</div>
 </dialog>
 
-debug deckName: @deckName
+debug deckName: @DeckName
 <br>
-debug selectedCategory: @selectedCategory
+debug selectedCategory: @SelectedCategory
 <br>
 debug tempQuestion: @tempQuestion
 <br>
 debug tempAnswer: @tempAnswer
 <br>
-debug flashCardProblemsLength: @FlashCardService.FlashCardProblems.Count
+debug flashCardProblemsLength: @flashCardProblems.Count
 <ul>
-	@for (int i = 0; i < FlashCardService.FlashCardProblems.Count; i++)
+	@for (int i = 0; i < flashCardProblems.Count; i++)
 	{
-		var problem = FlashCardService.FlashCardProblems[i];
+		var problem = flashCardProblems[i];
 		<li>
-			<strong>Index:</strong> @i <br />
-			<strong>Question:</strong> @problem.Question <br />
+			<strong>Index:</strong> @i <br/>
+			<strong>Question:</strong> @problem.Question <br/>
 			<strong>Answer:</strong> @problem.Answer
 		</li>
 	}
