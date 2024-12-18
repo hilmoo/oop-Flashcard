@@ -23,7 +23,7 @@ Visit [oop.hilmo.my.id](https://oop.hilmo.my.id)
 1. Create or update your `.env` file with the necessary environment variables. You can check the `.env.example` file for a template.
 2. Apply the database migrations:
     ```bash
-    Export="DATABASE_URL=Host=<YOUR_POSTGRES_HOST>;Database=<YOUR_POSTGRES_DB_NAME>;Username=<YOUR_POSTGRES_USER>;Password=<YOUR_POSTGRES_PASSWORD>"
+    export DATABASE_URL="Host=<YOUR_POSTGRES_HOST>;Database=<YOUR_POSTGRES_DB_NAME>;Username=<YOUR_POSTGRES_USER>;Password=<YOUR_POSTGRES_PASSWORD>"
     dotnet ef migrations add InitialCreate
     ```
 3. Build the application:
@@ -44,7 +44,7 @@ Visit [oop.hilmo.my.id](https://oop.hilmo.my.id)
 3. Update the `.env` file with the necessary values, using the `.env.example` file as a guide.
 4. Apply the database migrations:
     ```bash
-    Export="DATABASE_URL=Host=<YOUR_POSTGRES_HOST>;Database=<YOUR_POSTGRES_DB_NAME>;Username=<YOUR_POSTGRES_USER>;Password=<YOUR_POSTGRES_PASSWORD>"
+    export DATABASE_URL="Host=<YOUR_POSTGRES_HOST>;Database=<YOUR_POSTGRES_DB_NAME>;Username=<YOUR_POSTGRES_USER>;Password=<YOUR_POSTGRES_PASSWORD>"
     dotnet ef migrations add InitialCreate
     ```
 5. Start the Tailwind CSS build process:
