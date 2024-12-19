@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35431.28
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "flashcard", "flashcard.csproj", "{06DD8012-B22D-41E6-B34A-20A026EFAE62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleDotEnv", "SimpleDotEnv\SimpleDotEnv.csproj", "{0B5ACA79-71F8-4CE9-9E3D-99EA147827E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{06DD8012-B22D-41E6-B34A-20A026EFAE62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06DD8012-B22D-41E6-B34A-20A026EFAE62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06DD8012-B22D-41E6-B34A-20A026EFAE62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B5ACA79-71F8-4CE9-9E3D-99EA147827E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B5ACA79-71F8-4CE9-9E3D-99EA147827E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B5ACA79-71F8-4CE9-9E3D-99EA147827E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B5ACA79-71F8-4CE9-9E3D-99EA147827E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
