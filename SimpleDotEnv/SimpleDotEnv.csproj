@@ -10,6 +10,7 @@
 
     <PropertyGroup>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
         <AssemblyTitle>SimpleDotEnv</AssemblyTitle>
         <AssemblyCompany>XYZ Company</AssemblyCompany>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -20,5 +21,9 @@
 
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="obj\Debug\" />
     </ItemGroup>
 </Project>
