@@ -1,0 +1,22 @@
+<div class="flex items-center space-x-4">
+    <div class="dropdown dropdown-bottom dropdown-end">
+        <button tabindex="0" aria-label="Profile Menu" class="btn btn-ghost flex items-center space-x-2 rounded-md ">
+            <div class="avatar">
+                <div class="w-8 h-8 rounded-full overflow-hidden">
+                    <img src="@Profile?.ProfilePicture" alt="Profile Picture" referrerPolicy="no-referrer"
+                         class="object-cover w-full h-full"/>
+                </div>
+            </div>
+        </button>
+
+        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box shadow-md w-52 p-2 mt-2 space-y-1">
+            <li class="text-sm font-medium text-gray-100">
+                Hi, @Profile?.Name
+            </li>
+            <li><a href="#" class="sm:hidden rounded-lg py-2 px-4 transition-colors">My Bookmark</a></li>
+            <li><a href="#" class="sm:hidden rounded-lg py-2 px-4 transition-colors">My Deck</a></li>
+            <li><a href="/auth/signout" class="text-red-600 hover:bg-gray-900 rounded-lg py-2 px-4 transition-colors">Logout</a>
+            </li>
+        </ul>
+    </div>
+</div>

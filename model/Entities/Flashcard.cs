@@ -1,27 +1,24 @@
-using Supabase.Postgrest.Attributes;
-using Supabase.Postgrest.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace flashcard.model.Entities
 {
-	[Table("flashcards")]
-	class Flashcard : BaseModel
-	{
-		[PrimaryKey("id", false)]
-		public int Id { get; set; }
+    [Table("flashcards")]
+    public record FlashCard
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("id")]
+        public int Id { get; init; }
 
-		[Column("slug")]
-		public string Slug { get; set; }
+        [Required] [Column("slug")] public string? Slug { get; set; }
 
-		[Column("title")]
-		public string Title { get; set; }
+        [Required] [Column("title")] public string? Title { get; set; }
 
-		[Column("category")]
-		public string Category { get; set; }
+        [Required] [Column("category")] public string? Category { get; set; }
 
-		[Column("total_question")]
-		public int TotalQuestion { get; set; }
+        [Required] [Column("total_question")] public int TotalQuestion { get; set; }
 
-		[Column("account_id")]
-		public int AccountId { get; set; }
-	}
+        [Required] [Column("account_id")] public int AccountId { get; set; }
+    }
 }
