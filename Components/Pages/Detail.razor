@@ -1,9 +1,11 @@
-@page "/decks/{Slug}"
+@page "/d/{Slug}"
 @using flashcard.Data
 @layout flashcard.Components.Layout.DetailLayout
 @inject FlashCardService FlashCardService
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@deckData?.Title</PageTitle>
 <div class="h-screen w-screen">

@@ -10,8 +10,11 @@ namespace flashcard.Data
     {
         private readonly IDbContextFactory<DataContext> dbContextFactory =
             dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
+        public string DeckName { get; set; } = string.Empty;
+		public string SelectedCategory { get; set; } = string.Empty;
+        public string DeckDescription { get; set; } = string.Empty;
 
-        public async Task CreateNewFlashCard(FlashCardBase flashcardData, List<FlashCardProblem> flashCardProblems)
+        public async Task CreateNewFlashCard(DeckBase flashcardData, List<FlashCardProblem> flashCardProblems)
         {
             ArgumentNullException.ThrowIfNull(flashcardData);
 
@@ -22,15 +25,13 @@ namespace flashcard.Data
             await using var transaction = await context.Database.BeginTransactionAsync();
             try
             {
-                var slug = SafeCharRegex().Replace(flashcardData.Title.ToLower(), "")
-                               .Replace(" ", "-")
-                           + "-" + CustomRandom.GenerateRandomString(6);
+                var slug = SafeCharRegex().Replace(flashcardData.Title.ToLower(), "").Replace(" ", "-")+ "-" + CustomRandom.GenerateRandomString(6);
 
                 var accountId = context.Set<Account>().FirstOrDefault(a => a.GoogleId == flashcardData.GoogleId)?.Id;
                 if (accountId == null)
                     throw new Exception("Account not found");
 
-                var newFlashCard = new FlashCard
+                var newDeck = new Deck
                 {
                     Title = flashcardData.Title,
                     Description = flashcardData.Description,
@@ -41,16 +42,17 @@ namespace flashcard.Data
                     Slug = slug
                 };
 
-                var savedFlashcard = context.Set<FlashCard>().Add(newFlashCard);
+                var savedDeck = context.Set<Deck>().Add(newDeck);
+                await context.SaveChangesAsync();
 
-                var problems = flashCardProblems.Select(problem => new FlashCardProblems
+                var problems = flashCardProblems.Select(problem => new FlashCard
                 {
                     Question = problem.Question,
                     Answer = problem.Answer,
-                    FlashcardId = savedFlashcard.Entity.Id
+                    DeckId = savedDeck.Entity.Id
                 }).ToList();
 
-                context.Set<FlashCardProblems>().AddRange(problems);
+                context.Set<FlashCard>().AddRange(problems);
 
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -62,55 +64,230 @@ namespace flashcard.Data
             }
         }
 
-        public async Task<List<Flashcard>> GetAllFlashCards()
+        public async Task UpdateFlashCard(string slug, DeckBase flashcardData, List<FlashCard> flashCardProblems)
         {
+            ArgumentNullException.ThrowIfNull(flashcardData);
+
+            if (flashCardProblems == null || flashCardProblems.Count == 0)
+                throw new ArgumentException("FlashCardProblems cannot be null or empty.", nameof(flashCardProblems));
+
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync();
             try
             {
-                var response = await _supabaseClient
-                    .From<Flashcard>()
-                    .Select("*")
-                    .Get();
+                var accountId = context.Set<Account>().FirstOrDefault(a => a.GoogleId == flashcardData.GoogleId)?.Id;
+                if (accountId == null)
+                    throw new Exception("Account not found");
 
-                return response.Models;
+                var deck = await context.Set<Deck>()
+                    .FirstOrDefaultAsync(d => d.Slug == slug);
+
+                var flashCards = await context.Set<FlashCard>()
+                    .Where(fc => fc.DeckId == deck!.Id)
+                    .ToListAsync();
+                    
+                if (deck == null)
+                    throw new Exception("Deck not found");
+
+                // Update deck properties
+                deck.Title = flashcardData.Title;
+                deck.Description = flashcardData.Description;
+                deck.Category = flashcardData.Category;
+                deck.TotalQuestion = flashcardData.TotalQuestion;
+                deck.IsPublic = flashcardData.IsPublic;
+                deck.AccountId = accountId.Value;
+
+                // Remove all existing flashcards for this deck
+                if (flashCards != null && flashCards.Any())
+                {
+                    context.Set<FlashCard>().RemoveRange(flashCards);
+                }
+
+                // Create new flashcards
+                var problems = flashCardProblems.Select(problem => new FlashCard
+                {
+                    Question = problem.Question,
+                    Answer = problem.Answer,
+                    DeckId = deck.Id
+                }).ToList();
+
+                // Add new flashcards
+                context.Set<FlashCard>().AddRange(problems);
+
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error fetching flashcards: {ex.Message}");
-                return new List<Flashcard>();
+                await transaction.RollbackAsync();
+                throw;
             }
         }
 
-        public async Task<Flashcard> GetFlashcardBySlug(string slug)
+        public async Task DeleteDeck(string email, string slug)
         {
-            var deckName = await _supabaseClient
-                .From<Flashcard>()
-                .Where(x => x.Slug == slug)
-                .Single();
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            var currentAccountId = await context.Set<Account>()
+                .Where(a => a.Email == email)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
 
-            return deckName!;
-        }
+            var deckId = await context.Set<Deck>()
+                .Where(d => d.Slug == slug)
+                .Select(d => d.AccountId)
+                .FirstOrDefaultAsync();
 
-        public async Task<List<Problem>> GetProblemsByFlashcardSlug(string flashcardSlug)
-        {
+            if (currentAccountId != deckId)
+                throw new Exception("You are not authorized to delete this deck");
+
             try
             {
-                var flashcardId = (await _supabaseClient
-                    .From<Flashcard>()
-                    .Where(x => x.Slug == flashcardSlug)
-                    .Get()).Models.FirstOrDefault()?.Id;
-                var response = await _supabaseClient
-                    .From<Problem>()
-                    .Where(x => x.FlashcardId == flashcardId)
-                    .Get();
+                var deck = await context.Set<Deck>()
+                    .FirstOrDefaultAsync(d => d.Slug == slug);
 
-                Console.WriteLine("Jumlah problem: " + response.Models.Count);
-                return response.Models;
+                if (deck == null)
+                    throw new Exception("Deck not found");
+
+                var flashCards = await context.Set<FlashCard>()
+                    .Where(fc => fc.DeckId == deck.Id)
+                    .ToListAsync();
+
+                if (flashCards != null && flashCards.Any())
+                {
+                    context.Set<FlashCard>().RemoveRange(flashCards);
+                    await context.SaveChangesAsync();
+                }
+
+                context.Set<Deck>().Remove(deck);
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error fetching problems: {ex.Message}");
-                return new List<Problem>();
+                Console.WriteLine("Error deleting deck");
+                await transaction.RollbackAsync();
+                throw;
             }
+        }
+
+        public async Task<List<Deck>> GetAllDecks(string email)
+        {
+            if(email == null)
+            {
+                await using var pubContext = await dbContextFactory.CreateDbContextAsync();
+                var pubDecks = await pubContext.Set<Deck>().ToListAsync();
+                return pubDecks.Where(d => d.IsPublic).ToList();
+            }
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var currentAccountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            if (currentAccountId == default)
+            throw new Exception("Current account not found");
+
+            var decks = await context.Set<Deck>().ToListAsync();
+
+            return decks.Where(d => d.IsPublic || d.AccountId == currentAccountId).ToList();
+        }
+
+        public async Task<int> GetAccountIdByEmail(string email)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            return await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Deck>> GetAllDecksByEmail(string email)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var accountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            if (accountId == default)
+            throw new Exception("Account not found");
+
+            return await context.Set<Deck>()
+            .Where(d => d.AccountId == accountId)
+            .ToListAsync();
+        }
+
+        public async Task<bool> IsCanSeeDeck(string email, string deckSlug)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var accountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            // if (accountId == default)
+            // throw new Exception("Account not found");
+
+            var DeckData = await context.Set<Deck>()
+            .Where(d => d.Slug == deckSlug)
+            .FirstOrDefaultAsync();
+
+            if (DeckData == null)
+            {
+                return false;
+            }
+
+            if(DeckData!.IsPublic)
+            {
+                return true;
+            }
+            return DeckData.AccountId == accountId;
+        }
+
+        public async Task<bool> IsCanEditDeck(string email, string deckSlug)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var accountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            if (accountId == default)
+            throw new Exception("Account not found");
+
+            var DeckData = await context.Set<Deck>()
+            .Where(d => d.Slug == deckSlug)
+            .FirstOrDefaultAsync();
+
+            if (DeckData == null)
+            {
+                return false;
+            }
+
+            return DeckData.AccountId == accountId;
+        }
+
+        public async Task<Deck> GetDeckBySlug(string slug)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            return await context.Set<Deck>().FirstOrDefaultAsync(d => d.Slug == slug) ?? throw new Exception("Flashcard not found");
+        }
+
+        public async Task<List<FlashCard>> GetFlashcardByDeckSlug(string flashcardSlug)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var flashcardId = await context.Set<Deck>()
+            .Where(d => d.Slug == flashcardSlug)
+            .Select(d => d.Id)
+            .FirstOrDefaultAsync();
+
+            if (flashcardId == default)
+            throw new Exception("Flashcard not found");
+
+            return await context.Set<FlashCard>()
+            .Where(fc => fc.DeckId == flashcardId)
+            .ToListAsync();
         }
 
         [GeneratedRegex(@"[^a-z0-9\s-]")]

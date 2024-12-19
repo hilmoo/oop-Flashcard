@@ -2,3 +2,195 @@
 @using flashcard.Data
 @inject FlashCardService FlashCardService
 @rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using flashcard.model
+@using flashcard.utils
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Edit Flashcard Deck</PageTitle>
+<div class="flex flex-col py-10 max-w-xl mx-auto gap-3">
+    <div class="form-control w-full">
+        <div class="label">
+            <span class="label-text">Deck name</span>
+        </div>
+        <input type="text" placeholder="Type deck name" class="input input-bordered w-full rounded-lg"
+               @bind="deckName"/>
+    </div>
+    <div class="form-control w-full">
+        <div class="label">
+            <span class="label-text">Deck description</span>
+        </div>
+        <input type="text" placeholder="Type deck description" class="input input-bordered w-full rounded-lg"
+               @bind="deckDescription"/>
+    </div>
+    <div class="form-control w-full">
+        <div class="label">
+            <span class="label-text">Deck category</span>
+        </div>
+        <select class="select select-bordered rounded-lg max-[480px]:w-full" @bind="selectedCategory">
+            <option disabled selected>Select Category</option>
+            @foreach (var category in Category.GetCategoriesExceptAll())
+            {
+                <option value="@category.Value">@category.DisplayName</option>
+            }
+        </select>
+    </div>
+    <div class="pt-2 w-full">
+        <button class="btn rounded-lg w-full" onclick="add_card_modal.showModal()">Add Card</button>
+        <div class="overflow-x-auto">
+            <table class="table table-auto">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Actions</th>
+                    <th>Question</th>
+                    <th>Answer</th>
+                </tr>
+                </thead>
+                <tbody>
+                @for (var i = 0; i < flashCardProblems.Count; i++)
+                {
+                    var problem = flashCardProblems[i];
+                    var currentIndex = i;
+                    <tr class="hover">
+                        <th>@(i + 1)</th>
+                        <td>
+                            <div class="flex gap-2">
+                                <div class="cursor-pointer bg-transparent"
+                                    @onclick="() => OpenEditModal(currentIndex)">
+                                    @* <flashcard.Components.Icon.IconEdit/> *@
+                                    Edit
+                                </div>
+                                <div class="cursor-pointer bg-transparent"
+                                    @onclick="() => DeleteFlashCardProblem(currentIndex)">
+                                    <flashcard.Components.Icon.IconDelete/>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="truncate">@problem.Question</td>
+                        <td class="truncate">@problem.Answer</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <button class="btn rounded-lg w-full" onclick="finalize_modal.showModal()"
+                disabled="@(flashCardProblems.Count == 0)">
+            Update Deck
+        </button>
+        <button class="btn btn-error rounded-lg w-full" onclick="delete_deck_modal.showModal()">Delete Deck</button>
+    </div>
+</div>
+
+<!-- Add Card Modal -->
+<dialog id="add_card_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <form @onsubmit="HandleSave" @onsubmit:preventDefault>
+            <h3 class="text-lg font-bold">New Card</h3>
+            <div class="flex flex-col gap-5 py-3">
+                <textarea class="textarea textarea-bordered" placeholder="Question" @onchange="HandleQuestionChange"
+                          required></textarea>
+                <textarea class="textarea textarea-bordered" placeholder="Answer" @onchange="HandleAnswerChange"
+                          required></textarea>
+            </div>
+            <div class="flex flex-row justify-between">
+                <div onclick="add_card_modal.close()">
+                    <button type="button" class="btn btn-sm btn-error text-white rounded-md"
+                            @onclick="HandleDiscard" @onclick:preventDefault>
+                        Discard
+                    </button>
+                </div>
+                <button type="submit" class="btn btn-sm btn-success rounded-md" onclick="add_card_modal.close()">Save</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Edit Card Modal -->
+<dialog id="edit_card_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <form @onsubmit="HandleEditSave" @onsubmit:preventDefault>
+            <h3 class="text-lg font-bold">Edit Card</h3>
+            <div class="flex flex-col gap-5 py-3">
+                <textarea class="textarea textarea-bordered" placeholder="Question" @bind="editingQuestion"
+                          required></textarea>
+                <textarea class="textarea textarea-bordered" placeholder="Answer" @bind="editingAnswer"
+                          required></textarea>
+            </div>
+            <div class="flex flex-row justify-between">
+                <div onclick="edit_card_modal.close()">
+                    <button type="button" class="btn btn-sm btn-error text-white rounded-md"
+                            @onclick="HandleEditDiscard" @onclick:preventDefault>
+                        Discard
+                    </button>
+                </div>
+                <button type="submit" class="btn btn-sm btn-success rounded-md" onclick="edit_card_modal.close()">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Delete Deck Modal -->
+<dialog id="delete_deck_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Delete Deck</h3>
+        <div class="py-4">
+            <p>Are you sure you want to delete this deck?</p>
+            <p>This action cannot be undone.</p>
+        </div>
+        <div class="modal-action">
+            <form method="dialog" class="flex gap-2">
+                <button class="btn btn-ghost" onclick="delete_deck_modal.close()">Cancel</button>
+                <button class="btn btn-error" @onclick="HandleDelete" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="loading loading-spinner"></span>
+                    }
+                    Delete Deck
+                </button>
+            </form>
+        </div>
+    </div>
+</dialog>
+
+<!-- Finalize Modal -->
+<dialog id="finalize_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Update Deck</h3>
+        <div class="py-4">
+            <p>Are you sure you want to update this deck with @flashCardProblems.Count cards?</p>
+            <div class="mt-2">
+                <p><strong>Deck Name:</strong> @deckName</p>
+                <p><strong>Category:</strong> @selectedCategory</p>
+            </div>
+            <div class="mt-4">
+                <p><strong>Visibility:</strong></p>
+                <div class="flex gap-4">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="visibility" checked="@(deckVisibility == true)"
+                               @onclick="@(() => deckVisibility = true)" class="radio"/> Public
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="visibility" checked="@(deckVisibility == false)"
+                               @onclick="@(() => deckVisibility = false)" class="radio"/> Private
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-action">
+            <form method="dialog" class="flex gap-2">
+                <button class="btn btn-ghost" onclick="finalize_modal.close()">Cancel</button>
+                <button class="btn btn-primary" @onclick="HandleFinalize" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="loading loading-spinner"></span>
+                    }
+                    Update Deck
+                </button>
+            </form>
+        </div>
+    </div>
+</dialog>

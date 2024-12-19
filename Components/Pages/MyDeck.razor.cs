@@ -1,12 +1,11 @@
-﻿using flashcard.model.Entities;
-// using flashcard.z_dummydata;
+using flashcard.model.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
 namespace flashcard.Components.Pages
 {
-    public partial class Index : ComponentBase
+    public partial class MyDeck : ComponentBase
     {
         private string searchText = string.Empty;
         private string selectedCategory = string.Empty;
@@ -14,28 +13,22 @@ namespace flashcard.Components.Pages
         private List<Deck> filteredDeck = [];
         private string? userEmail;
 
-
         protected override async Task OnInitializedAsync()
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
-            Deck = await FlashCardService.GetAllDecks(userEmail!);
-            filteredDeck = Deck;
-
-            // if (user.Identity?.IsAuthenticated ?? false)
-            // {
-            //     userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
-            //     googleId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //     Deck = await FlashCardService.GetAllDecks(userEmail);
-            //     filteredDeck = Deck;
-            // }
-            // else
-            // {
-            //     Deck = [];
-            //     filteredDeck = Deck;
-            // }
+            if (user.Identity?.IsAuthenticated ?? false)
+            {
+                userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+                Deck = await FlashCardService.GetAllDecksByEmail(userEmail!);
+                filteredDeck = Deck;
+            }
+            else
+            {
+                Deck = [];
+                filteredDeck = Deck;
+            }
         }
 
         private void ApplyFilters()

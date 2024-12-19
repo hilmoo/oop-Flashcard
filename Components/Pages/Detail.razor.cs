@@ -1,28 +1,40 @@
 ﻿using flashcard.model.Entities;
-using flashcard.utils;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace flashcard.Components.Pages
 {
 	public partial class Detail : ComponentBase
 	{
 		[Parameter]
-		public string? Slug { get; set; }
+		public required string Slug { get; set; }
 
 		private bool isFirstRender = true;
 
-		private List<Problem> soal = [];
-		private Flashcard? deckData;
+		private List<FlashCard> soal = [];
+		private Deck? deckData;
 		private string? author;
         private int currentIndex = 0;
 		private bool IsStart { get; set; } = false;
+		private string? userEmail;
 
 		protected override async Task OnInitializedAsync()
 		{
-			soal = await FlashCardService.GetProblemsByFlashcardSlug(Slug);
-			deckData = await FlashCardService.GetFlashcardBySlug(Slug);
+			var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+			userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+
+			var canSee = await FlashCardService.IsCanSeeDeck(userEmail!, Slug);
+			if(!canSee)
+			{
+				Navigation.NavigateTo("/");
+				return;
+			}
+			soal = await FlashCardService.GetFlashcardByDeckSlug(Slug);
+			deckData = await FlashCardService.GetDeckBySlug(Slug);
 		}
 
 		protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace flashcard.model.Entities
 {
-    [Table("flashcard")]
-    public record FlashCard
+    [Table("decks")]
+    public record Deck
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,8 +20,8 @@ namespace flashcard.model.Entities
         [Required] [Column("account_id")] public int AccountId { get; set; }
     }
 
-    [Table("flashcards_problem")]
-    public record FlashCardProblems
+    [Table("flashcards")]
+    public record FlashCard
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -30,6 +30,6 @@ namespace flashcard.model.Entities
 
         [Required] [Column("question")] public string? Question { get; set; }
         [Required] [Column("answer")] public string? Answer { get; set; }
-        [Required] [Column("flashcard_id")] public int FlashcardId { get; set; }
+        [Required] [Column("deck_id")] public int DeckId { get; set; }
     }
 }

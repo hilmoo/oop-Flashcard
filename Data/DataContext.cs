@@ -10,5 +10,7 @@ namespace flashcard.Data
         }
 
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<FlashCard> FlashCards { get; set; }
+        public DbSet<Deck> Decks { get; set; }
     }
 }

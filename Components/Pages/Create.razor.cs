@@ -2,21 +2,40 @@
 using flashcard.model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using flashcard.utils;
-using flashcard.model.Entities;
+// using flashcard.utils;
+// using flashcard.model.Entities;
+// using Microsoft.JSInterop;
 
 namespace flashcard.Components.Pages
 {
     public partial class Create : ComponentBase
     {
-        private string? DeckName { get; set; }
-        private string? DeckDescription { get; set; }
-        private string? SelectedCategory { get; set; }
+        // private string? DeckName { get; set; }
+        // private string? DeckDescription { get; set; }
+        // private string? SelectedCategory { get; set; }
         private bool deckVisibility = true;
         private bool isSubmitting = false;
         private string tempQuestion = string.Empty;
         private string tempAnswer = string.Empty;
         private List<FlashCardProblem> flashCardProblems = [];
+
+        private string deckName
+		{
+			get => FlashCardService.DeckName;
+			set => FlashCardService.DeckName = value;
+		}
+
+		private string selectedCategory
+		{
+			get => FlashCardService.SelectedCategory;
+			set => FlashCardService.SelectedCategory = value;
+		}
+
+        private string deckDescription
+        {
+            get => FlashCardService.DeckDescription;
+            set => FlashCardService.DeckDescription = value;
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -48,6 +67,7 @@ namespace flashcard.Components.Pages
             if (!string.IsNullOrWhiteSpace(tempQuestion) && !string.IsNullOrWhiteSpace(tempAnswer))
             {
                 AddFlashCardProblem(tempQuestion, tempAnswer);
+                Console.WriteLine("Flashcard problem added with question: " + tempQuestion + " and answer: " + tempAnswer);
                 tempQuestion = string.Empty;
                 tempAnswer = string.Empty;
             }
@@ -65,16 +85,16 @@ namespace flashcard.Components.Pages
 
         private async Task HandleFinalize()
         {
-            if (string.IsNullOrWhiteSpace(DeckName) || string.IsNullOrWhiteSpace(SelectedCategory) ||
-                string.IsNullOrWhiteSpace(DeckDescription))
+            if (string.IsNullOrWhiteSpace(deckName) || string.IsNullOrWhiteSpace(selectedCategory) ||
+                string.IsNullOrWhiteSpace(deckDescription))
             {
-                // Show error message
+                Console.WriteLine("Please fill all the required fields");
                 return;
             }
 
             if (flashCardProblems.Count == 0)
             {
-                // Show error message
+                Console.WriteLine("Please add at least one flashcard problem");
                 return;
             }
 
@@ -88,15 +108,15 @@ namespace flashcard.Components.Pages
 
                 if (string.IsNullOrWhiteSpace(googleId))
                 {
-                    // Show error message
+                    Console.WriteLine("GoogleId claim is missing or empty.");
                     return;
                 }
 
-                var newDeck = new FlashCardBase
+                var newDeck = new DeckBase
                 {
-                    Title = DeckName,
-                    Description = DeckDescription,
-                    Category = SelectedCategory,
+                    Title = deckName,
+                    Description = deckDescription,
+                    Category = selectedCategory,
                     TotalQuestion = flashCardProblems.Count,
                     IsPublic = deckVisibility,
                     GoogleId = googleId,

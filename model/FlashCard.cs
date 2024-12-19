@@ -1,6 +1,6 @@
 ﻿namespace flashcard.model
 {
-    public class FlashCardBase
+    public class DeckBase
     {
         public required string Title { get; set; }
         public required string Description { get; set; }
@@ -10,7 +10,7 @@
         public required string GoogleId { get; set; }
     }
 
-    public class FlashCardBasic : FlashCardBase
+    public class DeckBasic : DeckBase
     {
         public required string Slug { get; set; }
     }

@@ -23,8 +23,8 @@ services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 services.AddDbContextFactory<DataContext>(options => { options.UseNpgsql(PostgresConstants.ConnectionString); });
-services.AddTransient<FlashCardService>();
-services.AddTransient<AccountServices>();
+services.AddScoped<FlashCardService>();
+services.AddScoped<AccountServices>();
 
 services.AddAuthentication("Cookies")
     .AddCookie(options =>
