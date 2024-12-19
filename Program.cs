@@ -2,9 +2,9 @@ using System.Security.Claims;
 using flashcard.Components;
 using flashcard.Data;
 using flashcard.utils;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using DotEnv = SimpleDotEnv.DotEnv;
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
