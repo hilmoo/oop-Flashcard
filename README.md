@@ -1,5 +1,5 @@
 
-# OOP-Flashcard
+# MindFlick
 
 An over-engineered flashcard platform designed to help users better remember specific concepts and problems.
 
