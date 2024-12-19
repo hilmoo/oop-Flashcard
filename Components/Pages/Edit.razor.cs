@@ -9,37 +9,21 @@ namespace flashcard.Components.Pages
 {
     public partial class Edit : ComponentBase
     {
-        [Parameter]
-        public string Slug { get; set; } = string.Empty;
-        
+        [Parameter] public string Slug { get; set; } = string.Empty;
+
+        private string? DeckName { get; set; }
+        private string? SelectedCategory { get; set; }
+        private string? DeckDescription { get; set; }
         private bool deckVisibility = true;
         private bool isSubmitting = false;
         private string tempQuestion = string.Empty;
         private string tempAnswer = string.Empty;
         private List<FlashCard> flashCardProblems = [];
-        
+
         // For editing existing cards
         private string editingQuestion = string.Empty;
         private string editingAnswer = string.Empty;
         private int editingIndex = -1;
-
-        private string deckName
-        {
-            get => FlashCardService.DeckName;
-            set => FlashCardService.DeckName = value;
-        }
-
-        private string selectedCategory
-        {
-            get => FlashCardService.SelectedCategory;
-            set => FlashCardService.SelectedCategory = value;
-        }
-
-        private string deckDescription
-        {
-            get => FlashCardService.DeckDescription;
-            set => FlashCardService.DeckDescription = value;
-        }
 
         private string? userEmail;
 
@@ -66,16 +50,11 @@ namespace flashcard.Components.Pages
             try
             {
                 var deck = await FlashCardService.GetDeckBySlug(Slug);
-                if (deck == null)
-                {
-                    Navigation.NavigateTo("/");
-                    return;
-                }
 
                 // Initialize the form with existing data
-                deckName = deck.Title!;
-                deckDescription = deck.Description!;
-                selectedCategory = deck.Category!;
+                DeckName = deck.Title!;
+                DeckDescription = deck.Description!;
+                SelectedCategory = deck.Category!;
                 deckVisibility = deck.IsPublic;
 
                 // Load flashcard problems
@@ -127,17 +106,18 @@ namespace flashcard.Components.Pages
             var problem = flashCardProblems[index];
             editingQuestion = problem.Question!;
             editingAnswer = problem.Answer!;
-            JSRuntime.InvokeVoidAsync("edit_card_modal.showModal");
+            JsRuntime.InvokeVoidAsync("edit_card_modal.showModal");
         }
 
         private void HandleEditSave()
         {
-            if (editingIndex >= 0 && !string.IsNullOrWhiteSpace(editingQuestion) && !string.IsNullOrWhiteSpace(editingAnswer))
+            if (editingIndex >= 0 && !string.IsNullOrWhiteSpace(editingQuestion) &&
+                !string.IsNullOrWhiteSpace(editingAnswer))
             {
-                flashCardProblems[editingIndex] = new FlashCard 
-                { 
-                    Question = editingQuestion, 
-                    Answer = editingAnswer 
+                flashCardProblems[editingIndex] = new FlashCard
+                {
+                    Question = editingQuestion,
+                    Answer = editingAnswer
                 };
                 editingIndex = -1;
                 editingQuestion = string.Empty;
@@ -162,10 +142,18 @@ namespace flashcard.Components.Pages
             flashCardProblems.RemoveAt(index);
         }
 
+        private bool IsFormIncomplete()
+        {
+            return string.IsNullOrWhiteSpace(DeckName) ||
+                   string.IsNullOrWhiteSpace(SelectedCategory) ||
+                   string.IsNullOrWhiteSpace(DeckDescription) ||
+                   flashCardProblems.Count == 0;
+        }
+
         private async Task HandleFinalize()
         {
-            if (string.IsNullOrWhiteSpace(deckName) || string.IsNullOrWhiteSpace(selectedCategory) ||
-                string.IsNullOrWhiteSpace(deckDescription))
+            if (string.IsNullOrWhiteSpace(DeckName) || string.IsNullOrWhiteSpace(SelectedCategory) ||
+                string.IsNullOrWhiteSpace(DeckDescription))
             {
                 Console.WriteLine("Please fill all the required fields");
                 return;
@@ -193,9 +181,9 @@ namespace flashcard.Components.Pages
 
                 var updatedDeck = new DeckBase
                 {
-                    Title = deckName,
-                    Description = deckDescription,
-                    Category = selectedCategory,
+                    Title = DeckName,
+                    Description = DeckDescription,
+                    Category = SelectedCategory,
                     TotalQuestion = flashCardProblems.Count,
                     IsPublic = deckVisibility,
                     GoogleId = googleId,
@@ -212,6 +200,11 @@ namespace flashcard.Components.Pages
             {
                 isSubmitting = false;
             }
+        }
+
+        private void NavigateToHome()
+        {
+            Navigation.NavigateTo("/", true);
         }
     }
 }

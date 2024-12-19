@@ -10,9 +10,6 @@ namespace flashcard.Data
     {
         private readonly IDbContextFactory<DataContext> dbContextFactory =
             dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
-        public string DeckName { get; set; } = string.Empty;
-		public string SelectedCategory { get; set; } = string.Empty;
-        public string DeckDescription { get; set; } = string.Empty;
 
         public async Task CreateNewFlashCard(DeckBase flashcardData, List<FlashCardProblem> flashCardProblems)
         {
@@ -25,7 +22,8 @@ namespace flashcard.Data
             await using var transaction = await context.Database.BeginTransactionAsync();
             try
             {
-                var slug = SafeCharRegex().Replace(flashcardData.Title.ToLower(), "").Replace(" ", "-")+ "-" + CustomRandom.GenerateRandomString(6);
+                var slug = SafeCharRegex().Replace(flashcardData.Title.ToLower(), "").Replace(" ", "-") + "-" +
+                           CustomRandom.GenerateRandomString(6);
 
                 var accountId = context.Set<Account>().FirstOrDefault(a => a.GoogleId == flashcardData.GoogleId)?.Id;
                 if (accountId == null)
@@ -85,7 +83,7 @@ namespace flashcard.Data
                 var flashCards = await context.Set<FlashCard>()
                     .Where(fc => fc.DeckId == deck!.Id)
                     .ToListAsync();
-                    
+
                 if (deck == null)
                     throw new Exception("Deck not found");
 
@@ -173,20 +171,21 @@ namespace flashcard.Data
 
         public async Task<List<Deck>> GetAllDecks(string email)
         {
-            if(email == null)
+            if (email == null)
             {
                 await using var pubContext = await dbContextFactory.CreateDbContextAsync();
                 var pubDecks = await pubContext.Set<Deck>().ToListAsync();
                 return pubDecks.Where(d => d.IsPublic).ToList();
             }
+
             await using var context = await dbContextFactory.CreateDbContextAsync();
             var currentAccountId = await context.Set<Account>()
-            .Where(a => a.Email == email)
-            .Select(a => a.Id)
-            .FirstOrDefaultAsync();
+                .Where(a => a.Email == email)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
 
             if (currentAccountId == default)
-            throw new Exception("Current account not found");
+                throw new Exception("Current account not found");
 
             var decks = await context.Set<Deck>().ToListAsync();
 
@@ -197,51 +196,52 @@ namespace flashcard.Data
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
             return await context.Set<Account>()
-            .Where(a => a.Email == email)
-            .Select(a => a.Id)
-            .FirstOrDefaultAsync();
+                .Where(a => a.Email == email)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<Deck>> GetAllDecksByEmail(string email)
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
             var accountId = await context.Set<Account>()
-            .Where(a => a.Email == email)
-            .Select(a => a.Id)
-            .FirstOrDefaultAsync();
+                .Where(a => a.Email == email)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
 
             if (accountId == default)
-            throw new Exception("Account not found");
+                throw new Exception("Account not found");
 
             return await context.Set<Deck>()
-            .Where(d => d.AccountId == accountId)
-            .ToListAsync();
+                .Where(d => d.AccountId == accountId)
+                .ToListAsync();
         }
 
         public async Task<bool> IsCanSeeDeck(string email, string deckSlug)
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
             var accountId = await context.Set<Account>()
-            .Where(a => a.Email == email)
-            .Select(a => a.Id)
-            .FirstOrDefaultAsync();
+                .Where(a => a.Email == email)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
 
             // if (accountId == default)
             // throw new Exception("Account not found");
 
             var DeckData = await context.Set<Deck>()
-            .Where(d => d.Slug == deckSlug)
-            .FirstOrDefaultAsync();
+                .Where(d => d.Slug == deckSlug)
+                .FirstOrDefaultAsync();
 
             if (DeckData == null)
             {
                 return false;
             }
 
-            if(DeckData!.IsPublic)
+            if (DeckData!.IsPublic)
             {
                 return true;
             }
+
             return DeckData.AccountId == accountId;
         }
 
@@ -249,16 +249,16 @@ namespace flashcard.Data
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
             var accountId = await context.Set<Account>()
-            .Where(a => a.Email == email)
-            .Select(a => a.Id)
-            .FirstOrDefaultAsync();
+                .Where(a => a.Email == email)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
 
             if (accountId == default)
-            throw new Exception("Account not found");
+                throw new Exception("Account not found");
 
             var DeckData = await context.Set<Deck>()
-            .Where(d => d.Slug == deckSlug)
-            .FirstOrDefaultAsync();
+                .Where(d => d.Slug == deckSlug)
+                .FirstOrDefaultAsync();
 
             if (DeckData == null)
             {
@@ -271,23 +271,24 @@ namespace flashcard.Data
         public async Task<Deck> GetDeckBySlug(string slug)
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
-            return await context.Set<Deck>().FirstOrDefaultAsync(d => d.Slug == slug) ?? throw new Exception("Flashcard not found");
+            return await context.Set<Deck>().FirstOrDefaultAsync(d => d.Slug == slug) ??
+                   throw new Exception("Flashcard not found");
         }
 
         public async Task<List<FlashCard>> GetFlashcardByDeckSlug(string flashcardSlug)
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
             var flashcardId = await context.Set<Deck>()
-            .Where(d => d.Slug == flashcardSlug)
-            .Select(d => d.Id)
-            .FirstOrDefaultAsync();
+                .Where(d => d.Slug == flashcardSlug)
+                .Select(d => d.Id)
+                .FirstOrDefaultAsync();
 
             if (flashcardId == default)
-            throw new Exception("Flashcard not found");
+                throw new Exception("Flashcard not found");
 
             return await context.Set<FlashCard>()
-            .Where(fc => fc.DeckId == flashcardId)
-            .ToListAsync();
+                .Where(fc => fc.DeckId == flashcardId)
+                .ToListAsync();
         }
 
         [GeneratedRegex(@"[^a-z0-9\s-]")]

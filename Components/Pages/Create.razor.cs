@@ -1,41 +1,24 @@
 ﻿using System.Security.Claims;
 using flashcard.model;
+using flashcard.model.Entities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-// using flashcard.utils;
-// using flashcard.model.Entities;
-// using Microsoft.JSInterop;
+using Microsoft.JSInterop;
 
 namespace flashcard.Components.Pages
 {
     public partial class Create : ComponentBase
     {
-        // private string? DeckName { get; set; }
-        // private string? DeckDescription { get; set; }
-        // private string? SelectedCategory { get; set; }
+        private string? DeckName { get; set; }
+        private string? SelectedCategory { get; set; }
+        private string? DeckDescription { get; set; }
         private bool deckVisibility = true;
         private bool isSubmitting = false;
-        private string tempQuestion = string.Empty;
-        private string tempAnswer = string.Empty;
-        private List<FlashCardProblem> flashCardProblems = [];
-
-        private string deckName
-		{
-			get => FlashCardService.DeckName;
-			set => FlashCardService.DeckName = value;
-		}
-
-		private string selectedCategory
-		{
-			get => FlashCardService.SelectedCategory;
-			set => FlashCardService.SelectedCategory = value;
-		}
-
-        private string deckDescription
-        {
-            get => FlashCardService.DeckDescription;
-            set => FlashCardService.DeckDescription = value;
-        }
+        private string? TempQuestion { get; set; }
+        private string? TempAnswer { get; set; }
+        private readonly List<FlashCardProblem> flashCardProblems = [];
+        private string editingQuestion = string.Empty;
+        private string editingAnswer = string.Empty;
+        private int editingIndex = -1;
 
         protected override async Task OnInitializedAsync()
         {
@@ -46,31 +29,19 @@ namespace flashcard.Components.Pages
             }
         }
 
-        private void HandleQuestionChange(ChangeEventArgs e)
-        {
-            tempQuestion = e.Value?.ToString() ?? string.Empty;
-        }
-
-        private void HandleAnswerChange(ChangeEventArgs e)
-        {
-            tempAnswer = e.Value?.ToString() ?? string.Empty;
-        }
-
         private void HandleDiscard()
         {
-            tempQuestion = string.Empty;
-            tempAnswer = string.Empty;
+            TempQuestion = string.Empty;
+            TempAnswer = string.Empty;
         }
 
         private void HandleSave()
         {
-            if (!string.IsNullOrWhiteSpace(tempQuestion) && !string.IsNullOrWhiteSpace(tempAnswer))
-            {
-                AddFlashCardProblem(tempQuestion, tempAnswer);
-                Console.WriteLine("Flashcard problem added with question: " + tempQuestion + " and answer: " + tempAnswer);
-                tempQuestion = string.Empty;
-                tempAnswer = string.Empty;
-            }
+            if (string.IsNullOrWhiteSpace(TempQuestion) || string.IsNullOrWhiteSpace(TempAnswer)) return;
+            AddFlashCardProblem(TempQuestion, TempAnswer);
+            Console.WriteLine("Flashcard problem added with question: " + TempQuestion + " and answer: " + TempAnswer);
+            TempQuestion = string.Empty;
+            TempAnswer = string.Empty;
         }
 
         private void AddFlashCardProblem(string question, string answer)
@@ -83,10 +54,51 @@ namespace flashcard.Components.Pages
             flashCardProblems.RemoveAt(index);
         }
 
+        private void OpenEditModal(int index)
+        {
+            editingIndex = index;
+            var problem = flashCardProblems[index];
+            editingQuestion = problem.Question!;
+            editingAnswer = problem.Answer!;
+            JsRuntime.InvokeVoidAsync("edit_card_modal.showModal");
+        }
+
+        private void HandleEditSave()
+        {
+            if (editingIndex >= 0 && !string.IsNullOrWhiteSpace(editingQuestion) &&
+                !string.IsNullOrWhiteSpace(editingAnswer))
+            {
+                flashCardProblems[editingIndex] = new FlashCardProblem()
+                {
+                    Question = editingQuestion,
+                    Answer = editingAnswer
+                };
+                editingIndex = -1;
+                editingQuestion = string.Empty;
+                editingAnswer = string.Empty;
+            }
+        }
+
+        private void HandleEditDiscard()
+        {
+            editingIndex = -1;
+            editingQuestion = string.Empty;
+            editingAnswer = string.Empty;
+        }
+
+        private bool IsFormIncomplete()
+        {
+            return string.IsNullOrWhiteSpace(DeckName) ||
+                   string.IsNullOrWhiteSpace(SelectedCategory) ||
+                   string.IsNullOrWhiteSpace(DeckDescription) ||
+                   flashCardProblems.Count == 0;
+        }
+
+
         private async Task HandleFinalize()
         {
-            if (string.IsNullOrWhiteSpace(deckName) || string.IsNullOrWhiteSpace(selectedCategory) ||
-                string.IsNullOrWhiteSpace(deckDescription))
+            if (string.IsNullOrWhiteSpace(DeckName) || string.IsNullOrWhiteSpace(SelectedCategory) ||
+                string.IsNullOrWhiteSpace(DeckDescription))
             {
                 Console.WriteLine("Please fill all the required fields");
                 return;
@@ -114,9 +126,9 @@ namespace flashcard.Components.Pages
 
                 var newDeck = new DeckBase
                 {
-                    Title = deckName,
-                    Description = deckDescription,
-                    Category = selectedCategory,
+                    Title = DeckName,
+                    Description = DeckDescription,
+                    Category = SelectedCategory,
                     TotalQuestion = flashCardProblems.Count,
                     IsPublic = deckVisibility,
                     GoogleId = googleId,
@@ -134,6 +146,11 @@ namespace flashcard.Components.Pages
             {
                 isSubmitting = false;
             }
+        }
+
+        private void NavigateToHome()
+        {
+            Navigation.NavigateTo("/", true);
         }
     }
 }
