@@ -1,4 +1,5 @@
-﻿namespace SimpleDotEnv;
+﻿namespace SimpleDotEnvLocal;
+// namespace SimpleDotEnv; for nuget package
 
 using System;
 using System.IO;

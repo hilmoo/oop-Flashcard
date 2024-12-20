@@ -1,24 +1,31 @@
 ﻿using System.Security.Claims;
 using flashcard.model;
-using flashcard.model.Entities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using flashcard.model.Entities;
 using Microsoft.JSInterop;
 
 namespace flashcard.Components.Pages
 {
-    public partial class Create : ComponentBase
+    public partial class Edit : ComponentBase
     {
+        [Parameter] public string Slug { get; set; } = string.Empty;
+
         private string? DeckName { get; set; }
         private string? SelectedCategory { get; set; }
         private string? DeckDescription { get; set; }
         private bool deckVisibility = true;
         private bool isSubmitting = false;
-        private string? TempQuestion { get; set; }
-        private string? TempAnswer { get; set; }
-        private readonly List<FlashCardProblem> flashCardProblems = [];
+        private string tempQuestion = string.Empty;
+        private string tempAnswer = string.Empty;
+        private List<FlashCard> flashCardProblems = [];
+
+        // For editing existing cards
         private string editingQuestion = string.Empty;
         private string editingAnswer = string.Empty;
         private int editingIndex = -1;
+
+        private string? userEmail;
 
         protected override async Task OnInitializedAsync()
         {
@@ -26,32 +33,71 @@ namespace flashcard.Components.Pages
             if (!authState.User.Identity!.IsAuthenticated)
             {
                 Navigation.NavigateTo("/auth/signin");
+                return;
             }
+
+            var user = authState.User;
+            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+
+            var canEdit = await FlashCardService.IsCanEditDeck(userEmail!, Slug);
+            if (!canEdit)
+            {
+                Navigation.NavigateTo("/");
+                return;
+            }
+
+            // Load existing deck data
+            try
+            {
+                var deck = await FlashCardService.GetDeckBySlug(Slug);
+
+                // Initialize the form with existing data
+                DeckName = deck.Title!;
+                DeckDescription = deck.Description!;
+                SelectedCategory = deck.Category!;
+                deckVisibility = deck.IsPublic;
+
+                // Load flashcard problems
+                flashCardProblems = await FlashCardService.GetFlashcardByDeckSlug(deck.Slug!);
+                // flashCardProblems = problems.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading deck: {ex}");
+                Navigation.NavigateTo("/");
+            }
+        }
+
+        private void HandleQuestionChange(ChangeEventArgs e)
+        {
+            tempQuestion = e.Value?.ToString() ?? string.Empty;
+        }
+
+        private void HandleAnswerChange(ChangeEventArgs e)
+        {
+            tempAnswer = e.Value?.ToString() ?? string.Empty;
+        }
+
+        private async Task HandleDelete()
+        {
+            await FlashCardService.DeleteDeck(userEmail!, Slug);
+            Navigation.NavigateTo("/");
         }
 
         private void HandleDiscard()
         {
-            TempQuestion = string.Empty;
-            TempAnswer = string.Empty;
+            tempQuestion = string.Empty;
+            tempAnswer = string.Empty;
         }
 
         private void HandleSave()
         {
-            if (string.IsNullOrWhiteSpace(TempQuestion) || string.IsNullOrWhiteSpace(TempAnswer)) return;
-            AddFlashCardProblem(TempQuestion, TempAnswer);
-            Console.WriteLine("Flashcard problem added with question: " + TempQuestion + " and answer: " + TempAnswer);
-            TempQuestion = string.Empty;
-            TempAnswer = string.Empty;
-        }
-
-        private void AddFlashCardProblem(string question, string answer)
-        {
-            flashCardProblems.Add(new FlashCardProblem { Question = question, Answer = answer });
-        }
-
-        private void DeleteFlashCardProblem(int index)
-        {
-            flashCardProblems.RemoveAt(index);
+            if (!string.IsNullOrWhiteSpace(tempQuestion) && !string.IsNullOrWhiteSpace(tempAnswer))
+            {
+                AddFlashCardProblem(tempQuestion, tempAnswer);
+                tempQuestion = string.Empty;
+                tempAnswer = string.Empty;
+            }
         }
 
         private void OpenEditModal(int index)
@@ -68,7 +114,7 @@ namespace flashcard.Components.Pages
             if (editingIndex >= 0 && !string.IsNullOrWhiteSpace(editingQuestion) &&
                 !string.IsNullOrWhiteSpace(editingAnswer))
             {
-                flashCardProblems[editingIndex] = new FlashCardProblem()
+                flashCardProblems[editingIndex] = new FlashCard
                 {
                     Question = editingQuestion,
                     Answer = editingAnswer
@@ -86,6 +132,16 @@ namespace flashcard.Components.Pages
             editingAnswer = string.Empty;
         }
 
+        private void AddFlashCardProblem(string question, string answer)
+        {
+            flashCardProblems.Add(new FlashCard { Question = question, Answer = answer });
+        }
+
+        private void DeleteFlashCardProblem(int index)
+        {
+            flashCardProblems.RemoveAt(index);
+        }
+
         private bool IsFormIncomplete()
         {
             return string.IsNullOrWhiteSpace(DeckName) ||
@@ -93,7 +149,6 @@ namespace flashcard.Components.Pages
                    string.IsNullOrWhiteSpace(DeckDescription) ||
                    flashCardProblems.Count == 0;
         }
-
 
         private async Task HandleFinalize()
         {
@@ -124,7 +179,7 @@ namespace flashcard.Components.Pages
                     return;
                 }
 
-                var newDeck = new DeckBase
+                var updatedDeck = new DeckBase
                 {
                     Title = DeckName,
                     Description = DeckDescription,
@@ -134,13 +189,12 @@ namespace flashcard.Components.Pages
                     GoogleId = googleId,
                 };
 
-                await FlashCardService.CreateNewFlashCard(newDeck, flashCardProblems);
+                await FlashCardService.UpdateFlashCard(Slug, updatedDeck, flashCardProblems);
                 Navigation.NavigateTo("/");
             }
             catch (Exception ex)
             {
-                // Handle error
-                Console.WriteLine(ex);
+                Console.WriteLine($"Error updating deck: {ex}");
             }
             finally
             {
