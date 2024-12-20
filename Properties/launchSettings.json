@@ -18,12 +18,11 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "httpWatch": {
+    "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5043",
-      "commandLineArgs": "watch run debug --launch-profile http",
+      "applicationUrl": "https://localhost:7022;http://localhost:5260",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
