@@ -22,6 +22,7 @@ logging.AddConsole();
 services.AddHttpContextAccessor();
 services.AddRazorComponents()
     .AddInteractiveServerComponents();
+services.AddControllers();
 
 services.AddDbContextFactory<DataContext>(options => { options.UseNpgsql(PostgresConstants.ConnectionString); });
 services.AddScoped<FlashCardService>();
@@ -109,6 +110,8 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
