@@ -88,6 +88,7 @@ namespace flashcard.Data
                     throw new Exception("Deck not found");
 
                 // Update deck properties
+                deck.Slug = SafeCharRegex().Replace(flashcardData.Title.ToLower(), "").Replace(" ", "-") + "-" + CustomRandom.GenerateRandomString(6);
                 deck.Title = flashcardData.Title;
                 deck.Description = flashcardData.Description;
                 deck.Category = flashcardData.Category;
@@ -204,10 +205,12 @@ namespace flashcard.Data
         public async Task<string> GetAuthorByAccountId(int accountId)
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
+#pragma warning disable CS8603 // Possible null reference return.
             return await context.Set<Account>()
                 .Where(a => a.Id == accountId)
                 .Select(a => a.Name)
                 .FirstOrDefaultAsync();
+#pragma warning restore CS8603 // Possible null reference return.
         }
 
         public async Task<List<Deck>> GetAllDecksByEmail(string email)
