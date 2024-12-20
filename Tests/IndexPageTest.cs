@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using flashcard.Components.Components;
 using flashcard.Components.Layout;
-using flashcard.Components.Pages;
 using flashcard.Data;
 using Microsoft.EntityFrameworkCore;
+using Index = flashcard.Components.Pages.Index;
 
 namespace flashcard.Tests;
 
@@ -17,7 +17,7 @@ public class IndexPageTest : TestContext
         Services.AddSingleton<FlashCardService>();
         Services.AddSingleton<AccountServices>();
 
-        var indexComponent = RenderComponent<IndexPage>();
+        var indexComponent = RenderComponent<Index>();
         var searchBar = indexComponent.Find("input[type='text'][placeholder='Search']");
 
         Assert.NotNull(searchBar);
@@ -31,7 +31,7 @@ public class IndexPageTest : TestContext
         Services.AddSingleton<FlashCardService>();
         Services.AddSingleton<AccountServices>();
 
-        var indexComponent = RenderComponent<IndexPage>();
+        var indexComponent = RenderComponent<Index>();
         var selectElement = indexComponent.Find("select");
         var selectedOption = selectElement.QuerySelector("option[selected]");
 

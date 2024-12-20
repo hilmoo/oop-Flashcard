@@ -1,21 +1,24 @@
 @page "/d/{Slug}"
 @using flashcard.Data
-@layout flashcard.Components.Layout.DetailLayout
+@layout Layout.DetailLayout
 @using flashcard.Components.Components
 @inject FlashCardService FlashCardService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 @inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@deckData?.Title</PageTitle>
-<div class="h-screen w-screen">
+
+<div>
 	<div class="border-b border-gray-600">
-		<div class="flex h-16 items-center flex-nowrap px-2 sm:px-10">
-			<div class="hidden sm:block absolute sm:left-10">
-				<a href="/">
-					<img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-					     alt="Your Company">
+		<div class="flex h-[4.6rem] items-center flex-nowrap px-2 ">
+			<div class="hidden sm:block absolute ">
+				<a href="/" class="text-lg font-bold">
+					<div class="flex gap-1 items-center">
+						<img src="/svg/logo.svg" alt="logo MindFlick" class="h-14"/>
+						MindFlick
+					</div>
 				</a>
 			</div>
 			<div class="flex-grow flex-row items-center text-center">
@@ -24,12 +27,12 @@
 				</div>
 				<div>
 					<span
-						class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soal.Count</span>
+						class="text-lg font-semibold">@CurrentProgress</span>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="mx-auto max-w-7xl h-[calc(100vh-4.5rem)]  rounded-md">
+	<div class="mx-auto max-w-7xl h-[calc(100vh-5rem)]  rounded-md">
 		@if (!IsStart)
 		{
 			<div class="flex flex-col gap-5 h-full p-[2rem] mx-auto max-w-5xl">
@@ -48,14 +51,19 @@
 						{
 							<a href="/edit/@Slug" class="btn btn-active  w-full max-w-xl rounded-md">Edit</a>
 						}
-						@if (isMarked)
+
+						@switch (isMarked)
 						{
-							<button class="btn btn-active w-full max-w-xl rounded-md" @onclick=HandleDeckUnmark>Remove Deckmark</button>
-						}
-						else if (!isMarked && isAuthenticated)
-						{
-							
-							<button class="btn btn-active w-full max-w-xl rounded-md" @onclick=HandleDeckMark>Set Deckmark</button>
+							case true:
+								<button class="btn btn-active w-full max-w-xl rounded-md" @onclick=HandleDeckUnmark>
+									Remove Deckmark
+								</button>
+								break;
+							case false when isAuthenticated:
+								<button class="btn btn-active w-full max-w-xl rounded-md" @onclick=HandleDeckMark>
+									Set Deckmark
+								</button>
+								break;
 						}
 					</div>
 				</div>
@@ -67,13 +75,13 @@
 				<div class="flipcard cursor-pointer w-full h-full ">
 					<div class="flipcard-front bg-secondary">
 						<article class="prose lg:prose-xl">
-							<MarkdownRenderer Content="@soal[currentIndex].Question" />
+							<MarkdownRenderer Content="@soal[currentIndex].Question"/>
 							@* @soal[currentIndex].Question *@
 						</article>
 					</div>
 					<div class="flipcard-back bg-secondary">
 						<article class="prose lg:prose-xl">
-							<MarkdownRenderer Content="@soal[currentIndex].Answer" />
+							<MarkdownRenderer Content="@soal[currentIndex].Answer"/>
 							@* @soal[currentIndex].Answer *@
 						</article>
 					</div>
@@ -96,7 +104,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<script>
 				document.querySelectorAll('.flipcard').forEach(card => {
 					card.addEventListener('click', function (e) {
@@ -118,7 +126,7 @@
 						}, 100);
 					});
 				});
-				
+
 			</script>
 		}
 	</div>

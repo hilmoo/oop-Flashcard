@@ -1,8 +1,6 @@
-using flashcard.Components.Pages;
 using flashcard.Data;
 using flashcard.model.Entities;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 
 namespace flashcard.Tests;
 
@@ -15,7 +13,7 @@ public class DbTest : TestContext
         Services.AddSingleton<AccountServices>();
         var accountService = Services.GetRequiredService<AccountServices>();
 
-        var account = new Account()
+        var account = new Account
         {
             Email = "test@mail.com",
             GoogleId = "123",

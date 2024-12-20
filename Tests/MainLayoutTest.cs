@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using flashcard.Components.Components;
 using flashcard.Components.Layout;
-using flashcard.Components.Pages;
 using flashcard.Data;
 using Microsoft.EntityFrameworkCore;
 

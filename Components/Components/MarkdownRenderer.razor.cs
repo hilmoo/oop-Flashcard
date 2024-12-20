@@ -1,27 +1,26 @@
 using Microsoft.AspNetCore.Components;
 using Markdig;
 
-namespace flashcard.Components.Components
+namespace flashcard.Components.Components;
+
+public partial class MarkdownRenderer : ComponentBase
 {
-    public partial class MarkdownRenderer : ComponentBase
+    [Parameter]
+    public string? Content { get; set; }
+
+    private ElementReference contentElement;
+    private string renderedContent = "";
+
+    protected override async Task OnParametersSetAsync()
     {
-        [Parameter]
-        public string? Content { get; set; }
-
-        private ElementReference contentElement;
-        private string renderedContent = "";
-
-        protected override async Task OnParametersSetAsync()
+        if (!string.IsNullOrEmpty(Content))
         {
-            if (!string.IsNullOrEmpty(Content))
-            {
-                var pipeline = new MarkdownPipelineBuilder()
-                    .UseAdvancedExtensions()
-                    .Build();
-                renderedContent = Markdown.ToHtml(Content, pipeline);
+            var pipeline = new MarkdownPipelineBuilder()
+                .UseAdvancedExtensions()
+                .Build();
+            renderedContent = Markdown.ToHtml(Content, pipeline);
 
-                await InvokeAsync(StateHasChanged);
-            }
+            await InvokeAsync(StateHasChanged);
         }
     }
 }
