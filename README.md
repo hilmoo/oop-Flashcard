@@ -80,5 +80,5 @@ Visit [oop.hilmo.my.id](https://oop.hilmo.my.id)
    ```
 4. Run Docker
    ```bash
-   docker run -d -p 8080:8080 --name flashcard-container flashcard-app
+   docker run --env-file ./.env -d -p 8080:8080 --name flashcard-container flashcard-app
    ```
