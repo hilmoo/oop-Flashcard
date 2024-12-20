@@ -1,4 +1,5 @@
-﻿namespace SimpleDotEnv;
+﻿namespace SimpleDotEnvLocal;
+// namespace SimpleDotEnv; for nuget package
 
 using System;
 using System.IO;
@@ -42,7 +43,7 @@ public static class DotEnv
     /// True if the line is either a comment (starting with a '#') or consists only of whitespace; otherwise, false.
     /// </returns>
     private static bool IsCommentOrEmptyLine(string line) =>
-        string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith($"#");
+        string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith('#');
 
     /// Parses a line into a key-value pair where the key and value are separated by an '=' character.
     /// <param name="line">The input line to parse. It is expected to contain a key-value pair in the format "KEY=VALUE".</param>

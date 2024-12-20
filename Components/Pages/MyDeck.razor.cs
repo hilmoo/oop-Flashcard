@@ -1,10 +1,10 @@
-﻿using flashcard.model.Entities;
+using flashcard.model.Entities;
 using Microsoft.AspNetCore.Components;
 using System.Security.Claims;
 
 namespace flashcard.Components.Pages;
 
-public partial class Index : ComponentBase
+public partial class MyDeck : ComponentBase
 {
     private string searchText = string.Empty;
     private string selectedCategory = string.Empty;
@@ -12,15 +12,21 @@ public partial class Index : ComponentBase
     private List<Deck> filteredDeck = [];
     private string? userEmail;
 
-
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
-        deck = await FlashCardService.GetAllDecks(userEmail!);
-        filteredDeck = deck;
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            deck = await FlashCardService.GetAllDecksByEmail(userEmail!);
+            filteredDeck = deck;
+        }
+        else
+        {
+            Navigation.NavigateTo("/auth/signin");
+        }
     }
 
     private void ApplyFilters()

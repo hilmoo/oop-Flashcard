@@ -1,29 +1,17 @@
-﻿namespace flashcard.model
+﻿namespace flashcard.model;
+
+public class DeckBase
 {
-	public class FlashCard
-	{
-		public required string Slug { get; set; }
-		public required string Title { get; set; }
-		public required string Description { get; set; }
-		public required string Category { get; set; }
-		public required int TotalQuestion { get; set; }
-	}
-	public class FlashCardDetail
-	{
-		public required string Question { get; set; }
-		public required string Answer { get; set; }
-		public int FlashCardId { get; set; }
-	}
-	public class FlashCardNew
-	{
-		public required string Title { get; set; }
-		public required List<string> Questions { get; set; }
-		public required List<string> Answers { get; set; }
-		public required string Category { get; set; }
-	}
-	public class FlashCardProblem
-	{
-		public required string Question { get; set; }
-		public required string Answer { get; set; }
-	}
+    public required string Title { get; init; }
+    public required string Description { get; init; }
+    public required string Category { get; init; }
+    public required int TotalQuestion { get; init; }
+    public required bool IsPublic { get; init; }
+    public required string GoogleId { get; init; }
+}
+
+public class FlashCardProblem
+{
+    public required string Question { get; init; }
+    public required string Answer { get; init; }
 }

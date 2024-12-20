@@ -1,30 +1,36 @@
-
 # MindFlick
 
 An over-engineered flashcard platform designed to help users better remember specific concepts and problems.
 
 ## Features:
+
 - Bookmark Flashcards
 - Create Public Flashcards
 - Categorize Flashcards
 - Free to Use
+- Markdown Support
 
 ## Access the Platform
+
 Visit [oop.hilmo.my.id](https://oop.hilmo.my.id)
 
 ## How to Set Up and Build
 
 ### Prerequisites
+
 - .NET 8.0
 - PostgreSQL database
 - Google OAuth client ID and secret
 
 ### Running Locally
-1. Create or update your `.env` file with the necessary environment variables. You can check the `.env.example` file for a template.
+
+1. Create or update your `.env` file with the necessary environment variables. You can check the `.env.example` file for
+   a template.
 2. Apply the database migrations:
     ```bash
     export DATABASE_URL="Host=<YOUR_POSTGRES_HOST>;Database=<YOUR_POSTGRES_DB_NAME>;Username=<YOUR_POSTGRES_USER>;Password=<YOUR_POSTGRES_PASSWORD>"
     dotnet ef migrations add InitialCreate
+   dotnet ef database update
     ```
 3. Build the application:
     ```bash
@@ -36,6 +42,7 @@ Visit [oop.hilmo.my.id](https://oop.hilmo.my.id)
     ```
 
 ### Running in Development Mode
+
 1. Install npm if you haven't already.
 2. Install the required npm packages:
     ```bash
@@ -46,6 +53,7 @@ Visit [oop.hilmo.my.id](https://oop.hilmo.my.id)
     ```bash
     export DATABASE_URL="Host=<YOUR_POSTGRES_HOST>;Database=<YOUR_POSTGRES_DB_NAME>;Username=<YOUR_POSTGRES_USER>;Password=<YOUR_POSTGRES_PASSWORD>"
     dotnet ef migrations add InitialCreate
+   dotnet ef database update
     ```
 5. Start the Tailwind CSS build process:
     ```bash
