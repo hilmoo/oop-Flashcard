@@ -4,6 +4,7 @@ using flashcard.Components;
 using flashcard.Data;
 using flashcard.utils;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Entities_Account = flashcard.model.Entities.Account;
 using DotEnv = SimpleDotEnv.DotEnv;
@@ -107,6 +108,16 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseStaticFiles();
 app.UseAntiforgery();
