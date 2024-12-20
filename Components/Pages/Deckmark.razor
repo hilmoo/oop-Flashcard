@@ -1,0 +1,36 @@
+@page "/deckmark"
+@using flashcard.Data
+@inject FlashCardService FlashCardService
+@rendermode InteractiveServer
+@using flashcard.model
+@using flashcard.Components.Components
+@using flashcard.Components.Icon
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>My DeckMarks</PageTitle>
+
+<div class="pt-[3rem] flex h-full flex-col gap-10">
+	<div class="flex w-full items-center justify-center">
+		<div class="flex min-[480px]:flex-row flex-col w-full max-w-2xl gap-2 items-center">
+			<label class="input input-bordered flex items-center gap-2 w-full rounded-lg">
+				<input type="text" class="grow" placeholder="Search" @oninput="HandleSearch" />
+				<SearchIcon />
+			</label>
+			<select class="select select-bordered rounded-lg max-[480px]:w-full" @onchange="SelectCategory">
+				<option disabled selected>Select Category</option>
+				@foreach (var category in Category.GetCategories())
+				{
+					<option value="@category.Value">@category.DisplayName</option>
+				}
+			</select>
+		</div>
+	</div>
+	<div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+		@* TODO: PINDAHIN BOOKMARK AMA MY DECK KE PROFILE *@
+		@foreach (var flashCard in filteredDeck)
+		{
+			<FlashCardComponent DeckData="flashCard"/>
+		}
+	</div>
+</div>

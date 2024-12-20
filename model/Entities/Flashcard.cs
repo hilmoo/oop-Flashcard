@@ -32,4 +32,16 @@ namespace flashcard.model.Entities
         [Required] [Column("answer")] public string? Answer { get; set; }
         [Required] [Column("deck_id")] public int DeckId { get; set; }
     }
+
+    [Table("deckmarks")]
+    public record DeckMark
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("id")]
+        public int Id { get; init; }
+
+        [Required] [Column("deck_id")] public int DeckId { get; set; }
+        [Required] [Column("account_id")] public int AccountId { get; set; }
+    }
 }

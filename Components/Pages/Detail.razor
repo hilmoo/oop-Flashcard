@@ -47,6 +47,15 @@
 						{
 							<a href="/edit/@Slug" class="btn btn-active  w-full max-w-xl rounded-md">Edit</a>
 						}
+						@if (isMarked)
+						{
+							<button class="btn btn-active w-full max-w-xl rounded-md" @onclick=HandleDeckUnmark>Remove Deckmark</button>
+						}
+						else if (!isMarked && isAuthenticated)
+						{
+							
+							<button class="btn btn-active w-full max-w-xl rounded-md" @onclick=HandleDeckMark>Set Deckmark</button>
+						}
 					</div>
 				</div>
 			</div>

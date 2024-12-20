@@ -201,6 +201,15 @@ namespace flashcard.Data
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<string> GetAuthorByAccountId(int accountId)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            return await context.Set<Account>()
+                .Where(a => a.Id == accountId)
+                .Select(a => a.Name)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<List<Deck>> GetAllDecksByEmail(string email)
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
@@ -289,6 +298,108 @@ namespace flashcard.Data
             return await context.Set<FlashCard>()
                 .Where(fc => fc.DeckId == flashcardId)
                 .ToListAsync();
+        }
+
+        public async Task SetDeckMark(string email, string deckSlug)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var accountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            if (accountId == default)
+            throw new Exception("Account not found");
+
+            var deckId = await context.Set<Deck>()
+            .Where(d => d.Slug == deckSlug)
+            .Select(d => d.Id)
+            .FirstOrDefaultAsync();
+
+            if (deckId == default)
+            throw new Exception("Deck not found");
+
+            var deckMark = new DeckMark
+            {
+                DeckId = deckId,
+                AccountId = accountId
+            };
+
+            context.Set<DeckMark>().Add(deckMark);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task RemoveDeckMark(string email, string deckSlug)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var accountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            if (accountId == default)
+            throw new Exception("Account not found");
+
+            var deckId = await context.Set<Deck>()
+            .Where(d => d.Slug == deckSlug)
+            .Select(d => d.Id)
+            .FirstOrDefaultAsync();
+
+            if (deckId == default)
+            throw new Exception("Deck not found");
+
+            var deckMark = await context.Set<DeckMark>()
+            .FirstOrDefaultAsync(dm => dm.DeckId == deckId && dm.AccountId == accountId);
+
+            if (deckMark == null)
+            throw new Exception("Deck not marked");
+
+            context.Set<DeckMark>().Remove(deckMark);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsDeckMarked(string email, string deckSlug)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var accountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            if (accountId == default)
+            throw new Exception("Account not found");
+
+            var deckId = await context.Set<Deck>()
+            .Where(d => d.Slug == deckSlug)
+            .Select(d => d.Id)
+            .FirstOrDefaultAsync();
+
+            if (deckId == default)
+            throw new Exception("Deck not found");
+
+            return await context.Set<DeckMark>()
+            .AnyAsync(dm => dm.DeckId == deckId && dm.AccountId == accountId);
+        }
+
+        public async Task<List<Deck>> GetMarkedDecks(string email)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            var accountId = await context.Set<Account>()
+            .Where(a => a.Email == email)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+            if (accountId == default)
+            throw new Exception("Account not found");
+
+            var deckIds = await context.Set<DeckMark>()
+            .Where(dm => dm.AccountId == accountId)
+            .Select(dm => dm.DeckId)
+            .ToListAsync();
+
+            return await context.Set<Deck>()
+            .Where(d => deckIds.Contains(d.Id))
+            .ToListAsync();
         }
 
         [GeneratedRegex(@"[^a-z0-9\s-]")]

@@ -20,12 +20,15 @@ namespace flashcard.Components.Pages
         private bool canEdit = false;
         private bool IsStart { get; set; } = false;
         private string? userEmail;
+		private bool isMarked = false;
+		private bool isAuthenticated = false;
 
         protected override async Task OnInitializedAsync()
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
             userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+			isAuthenticated = user.Identity?.IsAuthenticated ?? false;
 
             var canSee = await FlashCardService.IsCanSeeDeck(userEmail!, Slug);
             if (!canSee)
@@ -37,6 +40,7 @@ namespace flashcard.Components.Pages
             if (!string.IsNullOrEmpty(userEmail)) 
             {
                 canEdit = await FlashCardService.IsCanEditDeck(userEmail!, Slug);
+				isMarked = await FlashCardService.IsDeckMarked(userEmail!, Slug);
             }
 
             soal = await FlashCardService.GetFlashcardByDeckSlug(Slug);
@@ -70,6 +74,16 @@ namespace flashcard.Components.Pages
                 await SaveStateToLocalStorage();
             }
         }
+
+		private async Task HandleDeckMark()
+		{
+			await FlashCardService.SetDeckMark(userEmail!, Slug);
+		}
+
+		private async Task HandleDeckUnmark()
+		{
+			await FlashCardService.RemoveDeckMark(userEmail!, Slug);
+		}
 
         private class SavedState
         {

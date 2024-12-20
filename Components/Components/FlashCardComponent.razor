@@ -1,3 +1,5 @@
+@using flashcard.Data
+@inject FlashCardService FlashCardService
 <a href="/d/@DeckData?.Slug" class="block p-6 border rounded-lg shadow bg-neutral hover:bg-opacity-90">
     <div class="flex flex-col min-h-[8rem] gap-2">
         <div class="flex grow flex-col gap-5">
@@ -7,7 +9,8 @@
             </div>
             <p class="text-sm line-clamp-3">@DeckData?.Description</p>
         </div>
-        <div class="flex justify-end">
+        <div class="flex justify-between">
+            <p class="text-sm truncate">Author: @author</p>
             <p class="text-sm truncate">@DeckData?.TotalQuestion Question</p>
         </div>
     </div>
