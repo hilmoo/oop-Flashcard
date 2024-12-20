@@ -1,7 +1,7 @@
+using System.Globalization;
 using System.Security.Claims;
 using flashcard.Components;
 using flashcard.Data;
-using flashcard.model.Entities;
 using flashcard.utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -47,10 +47,10 @@ services.AddAuthentication("Cookies")
         {
             var tokens = ctx.Properties.GetTokens().ToList();
 
-            tokens.Add(new AuthenticationToken()
+            tokens.Add(new AuthenticationToken
             {
                 Name = "TicketCreated",
-                Value = DateTime.UtcNow.ToString()
+                Value = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
             });
 
             ctx.Properties.StoreTokens(tokens);
@@ -81,7 +81,7 @@ services.AddAuthentication("Cookies")
             }
 
             // Create a new account object
-            var newAccount = new Entities_Account()
+            var newAccount = new Entities_Account
             {
                 Email = email,
                 Name = name,

@@ -10,12 +10,19 @@
         </button>
 
         <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box shadow-md w-52 p-2 mt-2 space-y-1 z-50">
-            <li class="text-sm font-medium text-gray-100">
-                Hi, @Profile?.Name
-            </li>
-            <li><a href="#" class="sm:hidden rounded-lg py-2 px-4 transition-colors">My Bookmark</a></li>
-            <li><a href="#" class="sm:hidden rounded-lg py-2 px-4 transition-colors">My Deck</a></li>
-            <li><a href="/auth/signout" class="text-red-600 hover:bg-gray-900 rounded-lg py-2 px-4 transition-colors">Sign Out</a>
+            <div class="flex flex-col py-3 items-center bg-base-200">
+                <li class="text-sm font-medium text-gray-100">
+                    Hi, @Profile?.Name
+                </li>
+                <li class="text-sm font-medium text-gray-100">
+                    @Profile?.Email
+                </li>
+            </div>
+            <li><a href="/deckmark" class="sm:hidden rounded-lg py-2 px-4 transition-colors">My Deckmark</a></li>
+            <li><a href="/my-decks" class="sm:hidden rounded-lg py-2 px-4 transition-colors">My Deck</a></li>
+            <li>
+                <a href="/auth/signout" class="text-red-600 hover:bg-gray-900 rounded-lg py-2 px-4 transition-colors">Sign
+                    Out</a>
             </li>
         </ul>
     </div>
