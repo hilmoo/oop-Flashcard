@@ -6,6 +6,7 @@ using flashcard.utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Entities_Account = flashcard.model.Entities.Account;
+using DotEnv = SimpleDotEnv.DotEnv;
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
