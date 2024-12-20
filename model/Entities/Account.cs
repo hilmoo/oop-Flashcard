@@ -14,5 +14,8 @@ namespace flashcard.model.Entities
         [Required] [Column("email")] public string? Email { get; init; }
         [Required] [Column("name")] public string? Name { get; init; }
         [Required] [Column("oauth_id")] public string? GoogleId { get; init; }
-    }
+
+		public virtual ICollection<Deck> Decks { get; init; } = new List<Deck>();
+		public virtual ICollection<DeckMark> DeckMarks { get; init; } = new List<DeckMark>();
+	}
 }
