@@ -1,6 +1,7 @@
 @page "/d/{Slug}"
 @using flashcard.Data
 @layout flashcard.Components.Layout.DetailLayout
+@using flashcard.Components.Components
 @inject FlashCardService FlashCardService
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
@@ -66,12 +67,14 @@
 				<div class="flipcard cursor-pointer w-full h-full ">
 					<div class="flipcard-front bg-secondary">
 						<article class="prose lg:prose-xl">
-							@soal[currentIndex].Question
+							<MarkdownKatexRenderer Content="@soal[currentIndex].Question" />
+							@* @soal[currentIndex].Question *@
 						</article>
 					</div>
 					<div class="flipcard-back bg-secondary">
 						<article class="prose lg:prose-xl">
-							@soal[currentIndex].Answer
+							<MarkdownKatexRenderer Content="@soal[currentIndex].Answer" />
+							@* @soal[currentIndex].Answer *@
 						</article>
 					</div>
 				</div>
@@ -93,6 +96,7 @@
 					</div>
 				</div>
 			</div>
+			
 			<script>
 				document.querySelectorAll('.flipcard').forEach(card => {
 					card.addEventListener('click', function (e) {
@@ -114,6 +118,7 @@
 						}, 100);
 					});
 				});
+				
 			</script>
 		}
 	</div>
