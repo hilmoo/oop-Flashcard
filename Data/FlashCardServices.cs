@@ -313,6 +313,14 @@ namespace flashcard.Data
                 .ToListAsync();
         }
 
+        public async Task<List<FlashCard>> GetFlashcardByDeckId(int deckId)
+        {
+            await using var context = await dbContextFactory.CreateDbContextAsync();
+            return await context.Set<FlashCard>()
+                .Where(fc => fc.DeckId == deckId)
+                .ToListAsync();
+        }
+
         public async Task SetDeckMark(string email, string deckSlug)
         {
             await using var context = await dbContextFactory.CreateDbContextAsync();
