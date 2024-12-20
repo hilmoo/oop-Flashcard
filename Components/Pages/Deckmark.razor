@@ -1,13 +1,14 @@
-﻿@page "/"
-@rendermode InteractiveServer
+@page "/deckmark"
 @using flashcard.Data
+@inject FlashCardService FlashCardService
+@rendermode InteractiveServer
 @using flashcard.model
 @using flashcard.Components.Components
 @using flashcard.Components.Icon
-@inject FlashCardService FlashCardService
 @inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
 
-<PageTitle>Flashcard</PageTitle>
+<PageTitle>My DeckMarks</PageTitle>
 
 <div class="pt-[3rem] flex h-full flex-col gap-10">
 	<div class="flex w-full items-center justify-center">
@@ -33,9 +34,3 @@
 		}
 	</div>
 </div>
-
-Debug search: @searchText
-<br>
-debug category: @selectedCategory
-<br />
-debug login : @userEmail
