@@ -16,7 +16,7 @@
 					<span class="text-lg font-semibold">Nama Soal</span>
 				</div>
 				<div>
-					<span class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soalll.Count</span>
+					<span id="progress-indicator" class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soalll.Count</span>
 				</div>
 			</div>
 		</div>
@@ -66,12 +66,12 @@
 				<div class="flex-none items-center h-14 ">
 					<div class="flex justify-center gap-10  items-center h-full">
 						<div class="probNavigate">
-							<button class="btn btn-circle btn-outline" @onclick="HandlePrev" disabled="@(!CanNavigatePrev)">
+							<button id="prev-button" class="btn btn-circle btn-outline" @onclick="HandlePrev" disabled="@(!CanNavigatePrev)">
 								<flashcard.Components.Icon.IconArrowLeft />
 							</button>
 						</div>
 						<div class="probNavigate">
-							<button class="btn btn-circle btn-outline" @onclick="HandleNext" disabled="@(!CanNavigateNext)">
+							<button id="next-button" class="btn btn-circle btn-outline" @onclick="HandleNext" disabled="@(!CanNavigateNext)">
 								<flashcard.Components.Icon.IconArrowRight />
 							</button>
 						</div>
