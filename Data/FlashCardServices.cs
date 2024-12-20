@@ -148,6 +148,16 @@ namespace flashcard.Data
                 if (deck == null)
                     throw new Exception("Deck not found");
 
+                var deckMarks = await context.Set<DeckMark>()
+                    .Where(dm => dm.DeckId == deck.Id)
+                    .ToListAsync();
+
+                if (deckMarks != null && deckMarks.Any())
+                {
+                    context.Set<DeckMark>().RemoveRange(deckMarks);
+                    await context.SaveChangesAsync();
+                }
+
                 var flashCards = await context.Set<FlashCard>()
                     .Where(fc => fc.DeckId == deck.Id)
                     .ToListAsync();
