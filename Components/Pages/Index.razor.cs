@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace flashcard.Components.Pages
 {
-    public partial class Index : ComponentBase
+    public partial class IndexPage : ComponentBase
     {
         private string searchText = string.Empty;
         private string selectedCategory = string.Empty;
@@ -23,19 +23,6 @@ namespace flashcard.Components.Pages
             userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
             Deck = await FlashCardService.GetAllDecks(userEmail!);
             filteredDeck = Deck;
-
-            // if (user.Identity?.IsAuthenticated ?? false)
-            // {
-            //     userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
-            //     googleId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //     Deck = await FlashCardService.GetAllDecks(userEmail);
-            //     filteredDeck = Deck;
-            // }
-            // else
-            // {
-            //     Deck = [];
-            //     filteredDeck = Deck;
-            // }
         }
 
         private void ApplyFilters()
