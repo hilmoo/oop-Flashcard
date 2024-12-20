@@ -11,10 +11,10 @@
 <div class="h-screen w-screen">
 	<div class="border-b border-gray-600">
 		<div class="flex h-16 items-center flex-nowrap px-2 sm:px-10">
-			<div class="absolute left-10">
+			<div class="hidden sm:block absolute sm:left-10">
 				<a href="/">
 					<img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-							 alt="Your Company">
+					     alt="Your Company">
 				</a>
 			</div>
 			<div class="flex-grow flex-row items-center text-center">
@@ -22,26 +22,32 @@
 					<span class="text-lg font-semibold">@deckData?.Title (@deckData?.Category)</span>
 				</div>
 				<div>
-					<span class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soal.Count</span>
+					<span
+						class="text-lg font-semibold">@((IsStart ? currentIndex + 1 : currentIndex)) / @soal.Count</span>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="mx-auto max-w-7xl h-[calc(100vh-4.5rem)]">
+	<div class="mx-auto max-w-7xl h-[calc(100vh-4.5rem)]  rounded-md">
 		@if (!IsStart)
 		{
 			<div class="flex flex-col gap-5 h-full p-[2rem] mx-auto max-w-5xl">
-				<div class="flex flex-col gap-3 p-10 justify-center bg-secondary w-full h-full items-center">
-					<p class="text-3xl text-center">
-						@deckData?.Title
-					</p>
-					<p class="text-lg line-clamp-6 text-center">
-						@deckData?.Description
-					</p>
-					<button class="btn btn-active" @onclick=ToggleStart>Start</button>
-					<a href="/edit/@Slug" class="btn btn-active">Edit</a>
-				</div>
-				<div class="flex-none items-center h-14 ">
+				<div class="flex flex-col h-screen bg-secondary p-10">
+					<div class="flex flex-col items-center justify-center flex-grow">
+						<p class="text-3xl text-center">
+							@deckData?.Title
+						</p>
+						<p class="text-lg line-clamp-6 text-center mt-2">
+							@deckData?.Description
+						</p>
+					</div>
+					<div class="flex flex-col items-center gap-3">
+						<button class="btn btn-active w-full max-w-xl  rounded-md" @onclick=ToggleStart>Start</button>
+						@if (canEdit)
+						{
+							<a href="/edit/@Slug" class="btn btn-active  w-full max-w-xl rounded-md">Edit</a>
+						}
+					</div>
 				</div>
 			</div>
 		}
@@ -64,13 +70,15 @@
 				<div class="flex-none items-center h-14 ">
 					<div class="flex justify-center gap-10  items-center h-full">
 						<div class="probNavigate">
-							<button class="btn btn-circle btn-outline" @onclick="HandlePrev" disabled="@(!CanNavigatePrev)">
-								<flashcard.Components.Icon.IconArrowLeft />
+							<button class="btn btn-circle btn-outline" @onclick="HandlePrev"
+							        disabled="@(!CanNavigatePrev)">
+								<flashcard.Components.Icon.IconArrowLeft/>
 							</button>
 						</div>
 						<div class="probNavigate">
-							<button class="btn btn-circle btn-outline" @onclick="HandleNext" disabled="@(!CanNavigateNext)">
-								<flashcard.Components.Icon.IconArrowRight />
+							<button class="btn btn-circle btn-outline" @onclick="HandleNext"
+							        disabled="@(!CanNavigateNext)">
+								<flashcard.Components.Icon.IconArrowRight/>
 							</button>
 						</div>
 					</div>

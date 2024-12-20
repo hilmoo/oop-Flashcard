@@ -79,7 +79,7 @@
 <div class="flex flex-col py-2 max-w-xl mx-auto gap-3">
 	<button class="btn rounded-lg w-full" onclick="finalize_modal.showModal()"
 	        disabled="@IsFormIncomplete()">
-		Create Cards
+		Create Deck
 	</button>
 </div>
 
@@ -138,26 +138,39 @@
 		<h3 class="text-lg font-bold">Finalize Deck</h3>
 		<div class="py-4">
 			<p>Are you sure you want to create this deck with @flashCardProblems.Count cards?</p>
-			<div class="mt-2">
-				<p><strong>Deck Name:</strong> @DeckName</p>
-				<p><strong>Description:</strong> @DeckDescription</p>
-				<p><strong>Category:</strong> @SelectedCategory</p>
+			<div class="mt-2 flex flex-col gap-2">
+				<div class="flex flex-col gap-1">
+					<strong>Deck Name:</strong>
+					<p>
+						@DeckName
+					</p>
+				</div>
+				<div class="flex flex-col gap-1">
+					<strong>Description:</strong>
+					<p>@DeckDescription</p>
+				</div>
+				<div class="flex flex-col gap-1">
+					<strong>Category:</strong>
+					<p>@SelectedCategory</p>
+				</div>
 			</div>
-			<div class="mt-4">
-				<p><strong>Visibility:</strong></p>
-				<div class="flex gap-4">
-					<label class="cursor-pointer">
-						<input type="radio" name="visibility" checked="@(deckVisibility == true)"
-						       @onclick="@(() => deckVisibility = true)" class="radio"/> Public
+			<div class="flex flex-col gap-2 mt-4">
+			<p><strong>Visibility:</strong></p>
+				<div class="flex flex-col gap-2">
+					<label class="flex flex-row items-center gap-5 cursor-pointer">
+						<input type="radio" name="visibility" checked="@(deckVisibility)"
+						       @onclick="@(() => deckVisibility = true)" class="radio"/>
+						<div class="label-text">Public</div>
 					</label>
-					<label class="cursor-pointer">
+					<label class="flex flex-row items-center gap-5 cursor-pointer">
 						<input type="radio" name="visibility" checked="@(deckVisibility == false)"
-						       @onclick="@(() => deckVisibility = false)" class="radio"/> Private
+						       @onclick="@(() => deckVisibility = false)" class="radio"/>
+						<div class="label-text">Private</div>
 					</label>
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-row justify-between">
+		<div class="flex flex-row justify-between pt-2">
 			<button class="btn btn-sm btn-error text-white rounded-md" onclick="finalize_modal.close()"
 			        @onclick:preventDefault>Cancel
 			</button>

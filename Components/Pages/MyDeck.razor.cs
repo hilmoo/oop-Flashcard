@@ -26,8 +26,7 @@ namespace flashcard.Components.Pages
             }
             else
             {
-                Deck = [];
-                filteredDeck = Deck;
+                Navigation.NavigateTo("/auth/signin");
             }
         }
 
